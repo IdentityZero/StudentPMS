@@ -1,0 +1,7 @@
+virt/
+pycache/
+*.txt
+!requirements.txt
+
+__pycache__/
+.pyc
