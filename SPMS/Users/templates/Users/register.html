@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+</head>
+<body>
+    <h1>Register</h1>
+    <p>Have an account? <a href="{% url 'login' %}">Login</a></p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        {% if form.errors %}
+            <div style="color: red;">
+                Please correct the errors below.
+            </div>
+        {% endif %}
+
+        {{form.as_p}}
+
+        <input type="submit" value="Create Account">
+    </form>
+</body>
+</html>
