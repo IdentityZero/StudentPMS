@@ -1,18 +1,79 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Student Profile Login</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'Users/images/logo.png' %}">
+    <link rel="stylesheet" href="{% static 'Users/css/login.css' %}">
+    <script src="https://kit.fontawesome.com/0551f41678.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <form method="POST">
-        {% csrf_token %}
-        {{form}}
-        <input type="submit" value="Login">
-    </form>
-    <p> Don't have an account? <a href="{% url 'register' %}">Sign up</a></p>
 
-    <a href="#">Forgot Password?</a>
+    <div class="container">
+        <div class="form-box">
+            <h1 id="title">Sign Up</h1>
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="input-group">
+                    <div class="selectbtn">
+                        <button type="button" id="selectT">Student</button>
+                        <button type="button" id="selectS">Teacher</button>
+                    </div>
+    
+                    <div class="input-field">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required id="id_username" placeholder="University ID XX-XXXXXX">
+                    </div>
+    
+                    <div class="input-field">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" name="password" autocomplete="current-password" required id="id_password" placeholder="Password">
+                    </div>
+                </div>
+                <div class="btn-field">
+                    <button type="button" id="signupBtn"><a style='color:white' href="{% url 'register' %}">Sign Up</a></button>
+                    <button type="submit" id="signinBtn" class="disable">Sign In</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script>
+
+let signupBtn = document.getElementById("signupBtn");
+let signinBtn = document.getElementById("signinBtn");
+let nameField = document.getElementById("nameField");
+let title = document.getElementById("title");
+let selectT = document.getElementById("selectT")
+let selectS = document.getElementById("selectS")
+
+signinBtn.onclick = function(){
+    nameField.style.maxHeight = "0";
+    title.innerHTML = "Sign In";
+    signupBtn.classList.add("disable");
+    signinBtn.classList.remove("disable");
+}
+
+signupBtn.onclick = function(){
+    nameField.style.maxHeight = "60px";
+    title.innerHTML = "Sign Up";
+    signupBtn.classList.remove("disable");
+    signinBtn.classList.add("disable");
+}
+
+selectT.onclick = function(){
+    selectT.classList.remove("disable");
+    selectS.classList.add("disable");
+}
+selectS.onclick = function(){
+    selectT.classList.add("disable");
+    selectS.classList.remove("disable");
+}
+
+</script>
+
 </body>
 </html>
