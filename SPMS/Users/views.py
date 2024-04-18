@@ -28,3 +28,4 @@ def register(request):
     context['form'] = form
 
     return render(request, 'Users/register.html', context)
+
