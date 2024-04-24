@@ -1,0 +1,139 @@
+{% extends 'Students/student-base.html' %} 
+{% load static %}
+
+{% block content %}
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <div>
+        <h1>Student PROFILE Page</h1>
+        <div>
+            <h2>Student Profile Details</h2>
+            First Name: {{ user.first_name }} <br>
+            Last Name: {{ user.last_name }} <br>
+            Email: {{ user.email }} <br>
+            Date of Birth: {{ user.usersprofile.user_date_of_birth }} <br>
+            Sex: {{ user.usersprofile.user_sex }} <br>
+            Contact Number: {{ user.usersprofile.user_contact_number }} <br>
+        </div>
+        <div>
+            <h2>Edit Profile</h2>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ user_form }}
+                {{ baseProf_form }}
+                <input type="submit" value="Save Changes">
+            </form>
+        </div>
+        <hr>
+        <hr>
+    </div>
+
+    <div>
+        <h2>Family Records</h2>
+        <div>
+            {% for fam in family_records %}
+            <div>
+                Relationship: {{fam.SP_relationship}} <br>
+                Firstname: {{fam.SP_fam_first_name}} <br>
+                Lastname: {{fam.SP_fam_last_name}} <br>
+                Contact Number: {{fam.SP_fam_contact_number}} <br>
+                Emergency Contact: {{fam.SP_fam_emergency_contact}} <hr>
+            </div>
+            {% endfor %}
+        </div>
+        <div>
+            <h3>Edit Family Member Records</h3>
+            {% for form in editFamily_form %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="pk" value="{{ form.instance.pk }}">
+                    {% if form.errors %}
+                        <ul class="errorlist">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    {{ form }}
+                    
+                    <input type="submit" value="Save Changes">
+                </form>
+                <br>
+            {% endfor %}
+        </div>
+        <hr>
+
+        <div>
+            <h3>Add Family Members</h3>
+            <form method="POST">
+                {% csrf_token %}
+                {{ addFamily_form }}
+                <input type="submit" value="Add Family Members">
+            </form>
+        </div>
+
+        <hr>
+        <hr>
+
+    </div>
+
+    <div>
+        <h1>Educational Background</h1>
+        <div>
+            <div>
+                <h2>Educational Background Details</h2>
+                {% for qs in educBg_qs %}
+                    Level: {{ qs.SP_education_level }} <br>
+                    Institution: {{ qs.SP_institution }} <br>
+                    Address: {{ qs.SP_address }} <br>
+                    Description: {{ qs.SP_description }} <br>
+                    Graduated/Last Year Attended: {{ qs.SP_last_year_attended }} <hr>
+                {% endfor %}
+            </div>
+
+            <div>
+                <h2>Edit Educational Background Details</h2>
+                {% for form in editEducBg_fs %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="pk" value="{{ form.instance.pk }}">
+                    {% if form.errors %}
+                        <ul class="errorlist">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    {{ form }}
+                    
+                    <input type="submit" value="Save Changes">
+                </form>
+                <br>
+            {% endfor %}
+            </div>
+
+            <hr>
+
+            <div>
+                <h2>Add Educational Background</h2>
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ addEducBg_form }}
+                    <input type="submit" value="Add Educational Background">
+                </form>
+            </div>
+
+        </div>
+    </div>
+    
+{% endblock %}

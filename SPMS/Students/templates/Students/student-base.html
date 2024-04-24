@@ -6,6 +6,22 @@
     <title>Base</title>
 </head>
 <body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{% url 'student-home' %}">Home</a></li>
+                <li><a href="{% url 'student-profile' %}">Profile</a></li>
+                <li><a href="#">Documents</a></li>
+                <li><a href="#">My Grades</a></li>
+                <li><a href="#">Prospectus</a></li>
+            </ul>
+        </nav>
+        <form action="{% url 'logout' %}" method="POST">
+        {% csrf_token %}
+        <input type="submit" value="Logout">
+    </form>
+    </header>
+    <h3>user: {{user.username}}</h3>
     {% block content %}
     
     {% endblock %}

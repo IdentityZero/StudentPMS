@@ -2,9 +2,5 @@
 {% load static %}
 
 {% block content %}
-    {{user.username}}
-    <form action="{% url 'logout' %}" method="POST">
-        {% csrf_token %}
-        <input type="submit" value="Logout">
-    </form>
+    <h1>Student HOME Page</h1>
 {% endblock %}
