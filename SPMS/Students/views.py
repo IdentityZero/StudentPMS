@@ -12,8 +12,14 @@ from .forms import (UsersProfileEditForm,
                     StudentFamilyRecordsAddForm,
                     StudentFamilyRecordsEditForm,
                     EducationalBackgroundEditForm,
-                    EducationalBackgroundAddForm)
-from .models import StudentProfile, StudentFamilyRecords, StudentEducationalBackground
+                    EducationalBackgroundAddForm, 
+                    StudentDocumentEditForm,
+                    StudentDocumentAddForm)
+from .models import (StudentProfile, 
+                    StudentFamilyRecords, 
+                    StudentEducationalBackground,
+                    StudentDocuments,
+                    DocumentTypes)
 
 from Users.models import UsersProfile
 
@@ -80,7 +86,6 @@ class ProfileView(LoginRequiredMixin,TemplateView):
         return render(request, self.template_name, context)
 
     def handleUserProfileEditForm(self,request):
-        print("FOrm 1")
         user = request.user
         profile_instance = UsersProfile.objects.get(user=user)
         baseProf_form = UsersProfileEditForm(request.POST, request.FILES,instance=profile_instance)
@@ -193,3 +198,100 @@ class ProfileView(LoginRequiredMixin,TemplateView):
         return {
             'addEducBg_form': addEducBg_form
         }
+
+
+class DocumentsView(LoginRequiredMixin, TemplateView):
+    template_name = 'Students/documents.html'
+    login_url = reverse_lazy('login')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        profile_instance = UsersProfile.objects.get(user=user.id)
+        student_profile_instance = StudentProfile.objects.get(profile=profile_instance)
+
+        # Get all documents
+        all_docs = StudentDocuments.objects.filter(SP=student_profile_instance)
+        context['all_docs_qs'] = all_docs
+
+        # Edit Documents
+        editDocs_formset = modelformset_factory(StudentDocuments,form=StudentDocumentEditForm, extra=0)
+        context['editDocs_fs'] = editDocs_formset(queryset=all_docs)
+
+        # Add Documents
+        context['addDocs_form'] = StudentDocumentAddForm(instance=student_profile_instance)
+
+        return context
+    
+    def post(self,request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        user = request.user
+
+        form_label = request.POST.get('formLabel')
+
+        if form_label == "StudentDocumentEditForm":
+            res = self.handleEditStudentDocuments(request)
+        elif form_label == "StudentDocumentAddForm":
+            res = self.handleAddStudentDocuments(request)
+        
+
+        if res == 0:
+            return HttpResponseRedirect(reverse('student-documents'))
+        else:
+            context.update(res)
+
+        return render(request, self.template_name, context)
+
+    def handleEditStudentDocuments(self,request):
+        id = request.POST.get('id')
+        instance = StudentDocuments.objects.get(id=id)
+        
+        form = StudentDocumentEditForm(request.POST,request.FILES,instance=instance)
+
+        if form.is_valid:
+            form.save()
+            return 0
+        
+        user = self.request.user
+        profile_instance = UsersProfile.objects.get(user=user.id)
+        student_profile_instance = StudentProfile.objects.get(profile=profile_instance)
+
+        # Get all documents
+        all_docs = StudentDocuments.objects.filter(SP=student_profile_instance)
+        
+        editDocs_formset = modelformset_factory(StudentDocuments,form=StudentDocumentEditForm, extra=0)
+
+        return {
+            'editDocs_fs': editDocs_formset(queryset=all_docs)
+        }
+
+    def handleAddStudentDocuments(self,request):
+        user = request.user
+        profile_instance = UsersProfile.objects.get(user=user)
+        student_profile_instance = StudentProfile.objects.get(profile=profile_instance)
+
+        form = StudentDocumentAddForm(request.POST, request.FILES, instance=student_profile_instance)
+
+        if form.is_valid():
+            # Unpack
+            document_type = DocumentTypes.objects.get(document_type=form.cleaned_data['SD_doc_type'])
+            document = request.FILES['SD_document']
+
+            new_doc = StudentDocuments.objects.create(
+                SP=student_profile_instance,
+                SD_doc_type=document_type,
+                SD_document=document
+            )
+            new_doc.save()
+
+            return 0
+        
+        return {
+            'addDocs_form': form
+        }
+
+
+
+
+
+

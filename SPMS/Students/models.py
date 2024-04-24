@@ -40,3 +40,20 @@ class StudentEducationalBackground(models.Model):
     SP_address = models.CharField(max_length=256)
     SP_description = models.TextField(blank=True, null=True)
     SP_last_year_attended = models.IntegerField('Year', help_text="Year graduated or last year attended")
+
+
+class DocumentTypes(models.Model):
+    document_type = models.CharField(max_length=256, unique=True)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.document_type
+
+
+class StudentDocuments(models.Model):
+    SP = models.ForeignKey(StudentProfile,on_delete=models.CASCADE)
+    SD_doc_type = models.ForeignKey(DocumentTypes, models.DO_NOTHING)
+    SD_document = models.FileField(upload_to="documents", blank=True, null=True)
+    SD_date_uploaded = models.DateTimeField(auto_now=True)
+
+

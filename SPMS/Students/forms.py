@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 
 
-from .models import StudentProfile, StudentFamilyRecords, StudentEducationalBackground
+from .models import StudentProfile, StudentFamilyRecords, StudentEducationalBackground, StudentDocuments
 from Users.models import UsersProfile
 
 class UserEditForm(forms.ModelForm):
@@ -97,3 +97,39 @@ class EducationalBackgroundAddForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(EducationalBackgroundAddForm, self).__init__(*args, **kwargs)
         self.fields['SP_last_year_attended'].help_text = ''
+
+
+class StudentDocumentEditForm(forms.ModelForm):
+    formLabel = forms.CharField(widget=forms.HiddenInput(), initial='StudentDocumentEditForm')
+    class Meta:
+        model = StudentDocuments
+        fields = ['SD_doc_type', 'SD_document']
+        labels = {
+            'SD_doc_type': "Document Type",
+            'SD_document': "File",
+        }
+
+        widgets = {
+            'SD_doc_type': forms.Select(attrs={'required': 'required'})
+        }
+
+    def add_prefix(self, field_name):
+        return field_name  # Override add_prefix to return the field name as is during formsets
+
+
+class StudentDocumentAddForm(forms.ModelForm):
+    formLabel = forms.CharField(widget=forms.HiddenInput(), initial='StudentDocumentAddForm')
+    class Meta:
+        model = StudentDocuments
+        fields = ['SD_doc_type', 'SD_document']
+        labels = {
+            'SD_doc_type': "Document Type",
+            'SD_document': "File",
+        }
+
+        widgets = {
+            'SD_doc_type': forms.Select(attrs={'required': 'required'})
+        }
+
+
+

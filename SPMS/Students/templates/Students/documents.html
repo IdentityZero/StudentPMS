@@ -1,0 +1,53 @@
+{% extends 'Students/student-base.html' %} 
+{% load static %}
+{% block page_title %}My Documents{% endblock %}
+
+{% block content %}
+    <h1>Documents</h1>
+
+    <div>
+        {% if messages %}
+            {{messages}}
+        {% endif %}
+    </div>
+
+    <div>
+        <h2>My Documents</h2>
+        <div>
+            {% for docs in all_docs_qs %}
+                Document Type: {{ docs.SD_doc_type }} <br>
+                {% if docs.SD_document %}
+                    Document: <a href="{{ docs.SD_document.url }}">{{ docs.SD_document }}</a><br>
+                {% else %}
+                    Document: None <br>
+                {% endif %}
+                Last modified: {{ docs.SD_date_uploaded }} <br>
+                <br>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div>
+        <h2>Edit Documents</h2>
+        <div>
+            {% for form in editDocs_fs %}
+            <form method="POST"  enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="pk" value="{{ form.instance.pk }}">
+                {{ form }}
+                <input type="submit" value="Save">
+            </form>
+            <br>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div>
+        <h2>Add Documents</h2>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ addDocs_form }}
+            <input type="submit" value="Add Document">
+        </form>
+    </div>
+{% endblock %}
