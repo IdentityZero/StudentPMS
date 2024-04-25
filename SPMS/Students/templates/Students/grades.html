@@ -1,0 +1,40 @@
+{% extends 'Students/student-base.html' %} 
+{% load static %}
+{% block page_title %}My Grades{% endblock %}
+
+{% block content %}
+
+    <h1>Grades</h1>
+    <div>
+        Department: {{ admission.curriculum.degree.department }} <br>
+        Degree: {{ admission.curriculum.degree }} <br>
+        Curriculum: {{ admission.curriculum }} <br>
+    </div>
+
+    <hr>
+    <hr>
+
+    <div>
+        {% for key, courses in curriculum_courses.items %}
+            <h2> Year {{ key.0 }}, Semester: {{ key.1 }}</h2>
+            <table border="1">
+                <tr>
+                    <th>Course Code</th>
+                    <th>Course Name</th>
+                    <th>Prerequisite Course</th>
+                    <th>Grades</th>
+                </tr>
+                {% for course in courses %}
+                    <tr>
+                        <th>{{ course.course.course_code}}</th>
+                        <td>{{ course.course.course_name }}</td>
+                        <td>{% for prereq in course.prereq %} {{ prereq.prereq_course }}, {% endfor %}</td>
+                        <td>{{ course.grade.grade }}</td>
+                    </tr>
+                {% endfor %}
+                
+            </table>
+        {% endfor %}
+    </div>
+
+{% endblock %}

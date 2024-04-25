@@ -7,6 +7,10 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.urls import reverse_lazy, reverse
 
+from itertools import groupby
+from operator import itemgetter
+import time
+
 from .forms import (UsersProfileEditForm, 
                     UserEditForm, 
                     StudentFamilyRecordsAddForm,
@@ -15,6 +19,7 @@ from .forms import (UsersProfileEditForm,
                     EducationalBackgroundAddForm, 
                     StudentDocumentEditForm,
                     StudentDocumentAddForm)
+
 from .models import (StudentProfile, 
                     StudentFamilyRecords, 
                     StudentEducationalBackground,
@@ -22,6 +27,7 @@ from .models import (StudentProfile,
                     DocumentTypes)
 
 from Users.models import UsersProfile
+from University.models import Admissions,CurriculumCourses, StudentGrades
 
 # Create your views here.
 @login_required
@@ -289,6 +295,56 @@ class DocumentsView(LoginRequiredMixin, TemplateView):
         return {
             'addDocs_form': form
         }
+
+
+class GradesView(LoginRequiredMixin, TemplateView):
+    template_name = 'Students/grades.html'
+    login_url = reverse_lazy('login')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        profile_instance = UsersProfile.objects.get(user=user.id)
+        student_profile_instance = StudentProfile.objects.get(profile=profile_instance)
+
+        # Get admissions
+        admission = Admissions.objects.filter(SP=student_profile_instance).last()
+        context['admission'] = admission
+        
+        start_time = time.time()
+        # Get student grades
+
+        grades = StudentGrades.objects.filter(SP=student_profile_instance)
+        print(grades)
+
+
+        # Get curriculum courses
+        curriculum = admission.curriculum # Get curriculum
+        curriculum_courses = CurriculumCourses.objects.filter(curriculum=curriculum)   # Get curriculum courses
+
+        grouped_courses = {}
+
+        for course in curriculum_courses:
+            # Get course prerequisite
+            course.prereq = course.prerequisites()
+            course.grade = grades.filter(course=course.course).last()
+
+            key = (course.year_level, course.semester)
+            
+            if key not in grouped_courses:
+                grouped_courses[key] = []
+            grouped_courses[key].append(course)
+        
+        context['curriculum_courses'] = grouped_courses
+
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+
+        print(f"Operation took {elapsed_time} seconds")
+        
+
+        return context
+
 
 
 

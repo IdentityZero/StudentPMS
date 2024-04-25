@@ -8,6 +8,9 @@ class StudentProfile(models.Model):
     profile = models.OneToOneField(UsersProfile, on_delete=models.CASCADE)
     SP_univ_email = models.EmailField(unique=True,null=True, blank=True)
 
+    def __str__(self):
+        return self.profile.user.username
+
 
 class StudentFamilyRecords(models.Model):
     RELATIONSHIP_CHOICES = [
