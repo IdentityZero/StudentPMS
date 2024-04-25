@@ -310,13 +310,13 @@ class GradesView(LoginRequiredMixin, TemplateView):
         # Get admissions
         admission = Admissions.objects.filter(SP=student_profile_instance).last()
         context['admission'] = admission
+
+        if not admission:
+            # Not enrolled
+            return context
         
-        start_time = time.time()
         # Get student grades
-
         grades = StudentGrades.objects.filter(SP=student_profile_instance)
-        print(grades)
-
 
         # Get curriculum courses
         curriculum = admission.curriculum # Get curriculum
@@ -336,12 +336,6 @@ class GradesView(LoginRequiredMixin, TemplateView):
             grouped_courses[key].append(course)
         
         context['curriculum_courses'] = grouped_courses
-
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-
-        print(f"Operation took {elapsed_time} seconds")
-        
 
         return context
 
