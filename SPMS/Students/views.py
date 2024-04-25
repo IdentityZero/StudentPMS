@@ -1,9 +1,10 @@
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
 from django.urls import reverse_lazy, reverse
 
@@ -32,6 +33,15 @@ from University.models import Admissions,CurriculumCourses, StudentGrades
 # Create your views here.
 @login_required
 def home(request):
+    user = request.user
+    profile = UsersProfile.objects.get(user=user)
+    try:
+        student_profile = StudentProfile.objects.get(profile=profile)
+    except StudentProfile.DoesNotExist:
+        messages.info(request, 'Not a student! Cannot access this platform')
+        logout(request)
+        return redirect('login')
+
     return render(request, 'Students/home.html')
 
 class ProfileView(LoginRequiredMixin,TemplateView):

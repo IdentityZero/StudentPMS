@@ -1,25 +1,112 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'Users/css/register.css' %}">
+    <script src="https://kit.fontawesome.com/0551f41678.js" crossorigin="anonymous"></script>
     <title>Register</title>
 </head>
 <body>
-    <h1>Register</h1>
-    <p>Have an account? <a href="{% url 'login' %}">Login</a></p>
-    
-    <form method="POST">
-        {% csrf_token %}
-        {% if form.errors %}
-            <div style="color: red;">
-                Please correct the errors below.
-            </div>
-        {% endif %}
+    <div class="container">
+        <div class="form-box">
+            <h1 id="title">Registration</h1>
 
-        {{form.as_p}}
+            {% if form.errors %}
+            <ul>
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+            {% endif %}
 
-        <input type="submit" value="Create Account">
-    </form>
+
+            <form id="registrationForm" method="POST">
+                {% csrf_token %}
+                <div class="input-group">
+
+                    <div class="input-field" id="studentIDField">
+                        <i class="fa-solid fa-user"></i>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <span class="warning-sign" id="studentIDWarning">⚠️</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="input-field" id="emailField">
+                        <i class="fa-solid fa-envelope"></i>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <span class="warning-sign" id="emailWarning">⚠️</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="input-field">
+                        <i class="fa-solid fa-lock"></i>
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}
+                        slkdjf
+                            <span class="warning-sign" id="passwordWarning" >⚠️</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="input-field">
+                        <i class="fa-solid fa-lock"></i>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}
+                            <span class="warning-sign" id="repeatPasswordWarning">⚠️</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="input-field">
+                        <i class="fa-solid fa-user"></i>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <span class="warning-sign" id="lastNameWarning">⚠️</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="input-field">
+                        <i class="fa-solid fa-user"></i>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <span class="warning-sign" id="firstNameWarning">⚠️</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="input-field">
+                        <label for="id_roles">Roles:</label>
+                        <select name="roles" id="id_roles">
+                            <option value="Student">Student</option>
+                            <option value="Faculty">Faculty</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="reg-btn">
+                    <button type="submit">CONFIRM</button> 
+                </div>  
+                <div class="cancel-btn">           
+                    <button type="button" id="cancelBtn">CANCEL</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let cancelBtn = document.getElementById("cancelBtn");
+
+        cancelBtn.onclick = function() {
+            if (confirm("Are you sure you want to cancel?")) {
+                window.location.href = "../"; 
+            }
+        };
+    </script>
 </body>
 </html>

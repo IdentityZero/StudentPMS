@@ -12,68 +12,79 @@
 <body>
 
     <div class="container">
-        <div class="form-box">
-            <h1 id="title">Sign Up</h1>
+        <div>
+            <H2>STUDENT PROFILE SYSTEM</H2>
+        </div>
 
-            <form method="POST">
+        <div class="form-box">
+            <h1 id="title">Login</h1>
+
+            <form id="loginForm" method="POST">
                 {% csrf_token %}
                 <div class="input-group">
                     <div class="selectbtn">
                         <button type="button" id="selectT">Student</button>
-                        <button type="button" id="selectS">Teacher</button>
+                        <button type="button" id="selectS" class="disable">Teacher</button>
                     </div>
-    
-                    <div class="input-field">
+
+                    <input type="hidden" value="Student" name="role" id="id_role">
+
+                    <label class="warning" id="warningMsg" style="display: block;">
+                        {% if messages %}
+                            {% for message in messages %}
+                                {{ message }}
+                            {% endfor %}
+                        {% endif %}
+                    </label>
+
+                    <div class="input-id">
                         <i class="fa-solid fa-user"></i>
                         <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required id="id_username" placeholder="University ID XX-XXXXXX">
                     </div>
     
-                    <div class="input-field">
+                    <div class="input-pass">
                         <i class="fa-solid fa-lock"></i>
                         <input type="password" name="password" autocomplete="current-password" required id="id_password" placeholder="Password">
                     </div>
                 </div>
+    
                 <div class="btn-field">
-                    <button type="button" id="signupBtn"><a style='color:white' href="{% url 'register' %}">Sign Up</a></button>
-                    <button type="submit" id="signinBtn" class="disable">Sign In</button>
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+    
+                <div class="login-btn">
+                    <button type="submit" id="loginBtn">Login</button>
+                </div>
+    
+                <div class="signup-btn">
+                    <a href="{% url 'register' %}">Don't have a Student Account? Sign Up</a>
                 </div>
             </form>
         </div>
+
     </div>
 
 <script>
-
-let signupBtn = document.getElementById("signupBtn");
-let signinBtn = document.getElementById("signinBtn");
-let nameField = document.getElementById("nameField");
-let title = document.getElementById("title");
-let selectT = document.getElementById("selectT")
-let selectS = document.getElementById("selectS")
-
-signinBtn.onclick = function(){
-    nameField.style.maxHeight = "0";
-    title.innerHTML = "Sign In";
-    signupBtn.classList.add("disable");
-    signinBtn.classList.remove("disable");
-}
-
-signupBtn.onclick = function(){
-    nameField.style.maxHeight = "60px";
-    title.innerHTML = "Sign Up";
-    signupBtn.classList.remove("disable");
-    signinBtn.classList.add("disable");
-}
-
-selectT.onclick = function(){
-    selectT.classList.remove("disable");
-    selectS.classList.add("disable");
-}
-selectS.onclick = function(){
-    selectT.classList.add("disable");
-    selectS.classList.remove("disable");
-}
-
+    let loginBtn = document.getElementById("loginBtn");
+    let title = document.getElementById("title");
+    let selectT = document.getElementById("selectT");
+    let selectS = document.getElementById("selectS");
+    let warningMsg = document.getElementById("warningMsg");
+    let role_input = document.getElementById("id_role")
+    
+    
+    selectT.onclick = function(){
+        selectT.classList.remove("disable");
+        selectS.classList.add("disable");
+        role_input.value="Student"
+    };
+    selectS.onclick = function(){
+        selectT.classList.add("disable");
+        selectS.classList.remove("disable");
+        role_input.value="Faculty"
+};
 </script>
+
 
 </body>
 </html>

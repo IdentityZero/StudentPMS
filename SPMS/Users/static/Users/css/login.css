@@ -14,6 +14,16 @@
     position: relative;
 }
 
+.container h2{
+   
+    font-size: 40px;
+    color: #fff;
+    position: relative;
+    text-align: center;
+    padding-top: 70px;
+    
+}
+
 .form-box{
     width: 90%;
     max-width: 450px;
@@ -22,9 +32,16 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background: #fff;
-    padding: 50px 60px 70px;
+    padding: 50px 50px 50px;
     text-align: center;
     border-radius: 10px;
+}
+
+.form-box label{
+    color: red;
+    margin-top: 15px;
+    margin-bottom: -33px;
+    text-align: center;
 }
 
 .form-box h1{
@@ -46,17 +63,30 @@
     transform: translateX(-50%);
 }
 
-.input-field{
+.input-id{
+
     background: #eaeaea;
-    margin: 15px 0;
+    margin-top: 40px;
     border-radius: 3px;
     display: flex;
     align-items: center;
     max-height: 65px;
     transition: max-height 0.5s;
     overflow: hidden;
+    
 }
 
+.input-pass{
+    margin-top: 10px;
+    background: #eaeaea;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    max-height: 65px;
+    transition: max-height 0.5s;
+    overflow: hidden;
+
+}
 input{
     width: 100%;
     background: transparent;
@@ -65,7 +95,12 @@ input{
     padding: 18px 15px;
 }
 
-.input-field i{
+.input-id i{
+    margin-left: 15px;
+    color: #999;
+}
+
+.input-pass i{
     margin-left: 15px;
     color: #999;
 }
@@ -87,26 +122,37 @@ form p a{
     padding-top: 10px;
 }
 
-.btn-field button{
-    flex-basis: 48%;
+.btn-field a{
+    margin: -73px 1px;
+    text-decoration: none;
+}
+
+.login-btn button{
     background: #3c00a0;
-    color: #fff;
-    height: 40px;
+    color: #ffffff;
+    font-size: 20px;
+    height: 50px;
+    width: 100%;
     border-radius: 20px;
     border: 0;
     outline: 0;
     cursor: pointer;
-    transition: background 1s;
+    transition: background 0.3s;
+    margin-top: -100px;
+    margin-bottom: 20px;
 }
 
+
+.signup-btn a{
+    font-size: 17px;
+    text-decoration: none;
+    margin-top: 20px;
+
+}
 .input-group{
     height: 260px;
 }
 
-.btn-field button.disable{
-    background: #eaeaea;
-    color: #555;
-}
 
 .selectbtn{
     width: 100%;
@@ -129,4 +175,8 @@ form p a{
 .selectbtn button.disable{
     background: #eaeaea;
     color: #555;
+}
+
+.login-btn button:hover{
+    background: #2d4aec;
 }
