@@ -1,11 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-</head>
-<body>
-    Hello Faculty
-</body>
-</html>
+{% extends 'Faculties/faculty-base.html' %} 
+{% load static %}
+
+{% block page_title %}Home{% endblock %}
+{% block additionalLinks %}
+{% endblock %}
+
+{% block content %}
+    <h1>Faculty Home Page</h1>
+{% endblock %}

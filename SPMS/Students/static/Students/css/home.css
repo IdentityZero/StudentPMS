@@ -1,0 +1,33 @@
+.jumbotron {
+    background-color: #007bff;
+    color: #fff;
+    padding: 2rem 1rem;
+    border-radius: 0;
+}
+.announcement {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.announcement h3 {
+    color: #007bff;
+    margin-top: 0;
+}
+.announcement p {
+    margin-bottom: 0.5rem;
+}
+.announcement .author {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+.footer {
+    background-color: #343a40;
+    color: #fff;
+    text-align: center;
+    padding: 1rem 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}

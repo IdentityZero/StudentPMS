@@ -110,7 +110,7 @@ class StudentDocumentEditForm(forms.ModelForm):
         }
 
         widgets = {
-            'SD_doc_type': forms.Select(attrs={'required': 'required'})
+            'SD_doc_type': forms.Select(attrs={'required': 'required'}),
         }
 
     def add_prefix(self, field_name):
@@ -128,7 +128,8 @@ class StudentDocumentAddForm(forms.ModelForm):
         }
 
         widgets = {
-            'SD_doc_type': forms.Select(attrs={'required': 'required'})
+            'SD_doc_type': forms.Select(attrs={'required': 'required'}),
+            'SD_document': forms.FileInput(attrs={'required': 'required'}),
         }
 
 

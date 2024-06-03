@@ -3,14 +3,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.forms import modelformset_factory
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from django.urls import reverse_lazy, reverse
+
 
 from itertools import groupby
 from operator import itemgetter
 import time
+import json
 
 from .forms import (UsersProfileEditForm, 
                     UserEditForm, 
@@ -28,21 +31,25 @@ from .models import (StudentProfile,
                     DocumentTypes)
 
 from Users.models import UsersProfile
-from University.models import Admissions,CurriculumCourses, StudentGrades
+from University.models import Admissions,CurriculumCourses, StudentGrades, Announcements
 
 # Create your views here.
 @login_required
 def home(request):
+
+    announcements = Announcements.objects.filter(is_active=True)
+
+    context= {'announcements':announcements}
     user = request.user
     profile = UsersProfile.objects.get(user=user)
     try:
         student_profile = StudentProfile.objects.get(profile=profile)
     except StudentProfile.DoesNotExist:
-        messages.info(request, 'Not a student! Cannot access this platform')
+        messages.info(request, 'Cannot access this platform')
         logout(request)
         return redirect('login')
 
-    return render(request, 'Students/home.html')
+    return render(request, 'Students/home.html',context)
 
 class ProfileView(LoginRequiredMixin,TemplateView):
     template_name = 'Students/profile.html'
@@ -349,6 +356,19 @@ class GradesView(LoginRequiredMixin, TemplateView):
 
         return context
 
+@csrf_exempt
+def deleteDocuments(request):
+
+    data = json.loads(request.body)
+    doc_id = int(data['doc'])
+
+    doc_ins = StudentDocuments.objects.get(id=doc_id)
+    doc_ins.delete()
+
+    res = {
+        "message": "Document Deleted"
+    }
+    return JsonResponse(res, status=200)
 
 
 

@@ -2,40 +2,76 @@
 {% load static %}
 {% block page_title %}My Grades{% endblock %}
 
+{% block additionalLinks %}
+<link rel="stylesheet" href="{% static 'Students/css/grades.css' %}">
+{% endblock %}
+
 {% block content %}
     {% if admission %}
-        <h1>Grades</h1>
-        <div>
-            Department: {{ admission.curriculum.degree.department }} <br>
-            Degree: {{ admission.curriculum.degree }} <br>
-            Curriculum: {{ admission.curriculum }} <br>
+        <h1>My Grades</h1>
+
+        <div class="mb-2">
+            <div class="card">
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Department:</strong> {{ admission.curriculum.degree.department }}</li>
+                        <li class="list-group-item"><strong>Degree:</strong> {{ admission.curriculum.degree }}</li>
+                        <li class="list-group-item"><strong>Curriculum:</strong> {{ admission.curriculum }}</li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
-        <hr>
-        <hr>
+        <div class="main-content-container container">
+            <div class="row">
+                <div class="col">
+                    <div class="accordion" id="semesterAccordion">
 
-        <div>
-            {% for key, courses in curriculum_courses.items %}
-                <h2> Year {{ key.0 }}, Semester: {{ key.1 }}</h2>
-                <table border="1">
-                    <tr>
-                        <th>Course Code</th>
-                        <th>Course Name</th>
-                        <th>Prerequisite Course</th>
-                        <th>Grades</th>
-                    </tr>
-                    {% for course in courses %}
-                        <tr>
-                            <th>{{ course.course.course_code}}</th>
-                            <td>{{ course.course.course_name }}</td>
-                            <td>{% for prereq in course.prereq %} {{ prereq.prereq_course }}, {% endfor %}</td>
-                            <td>{{ course.grade.grade }}</td>
-                        </tr>
-                    {% endfor %}
-                    
-                </table>
-            {% endfor %}
+                        {% for key, courses in curriculum_courses.items %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                {% if forloop.counter == 1 %}
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accordion-{{forloop.counter}}" aria-expanded="true" aria-controls="semester1Collapse"> Year {{ key.0 }}, Semester: {{ key.1 }}</button>
+                                {% else %}
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accordion-{{forloop.counter}}" aria-expanded="false" aria-controls="semester1Collapse"> Year {{ key.0 }}, Semester: {{ key.1 }}</button>
+                                {% endif %}
+                            </h2>
+                            {% if forloop.counter == 1 %}
+                            <div id="accordion-{{forloop.counter}}" class="accordion-collapse collapse show" aria-labelledby="semester1Header" data-bs-parent="#semesterAccordion">
+                            {% else %}
+                            <div id="accordion-{{forloop.counter}}" class="accordion-collapse collapse" aria-labelledby="semester1Header" data-bs-parent="#semesterAccordion">
+                            {% endif %}
+                                <div class="accordion-body">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Course Code</th>
+                                                <th scope="col">Course Name</th>
+                                                <th scope="col">Prerequisite Course</th>
+                                                <th scope="col">Grade</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for course in courses %}
+                                            <tr>
+                                                <td>{{ course.course.course_code }}</td>
+                                                <td>{{ course.course.course_name }}</td>
+                                                <td>{% for prereq in course.prereq %} {{ prereq.prereq_course }}, {% endfor %}</td>
+                                                <td>{{ course.grade.grade }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                    </div>
+                </div>
+            </div>
         </div>
+
     {% else %}
         <div>
             You do not have admission records

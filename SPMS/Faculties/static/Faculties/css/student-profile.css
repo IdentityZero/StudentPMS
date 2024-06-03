@@ -1,0 +1,90 @@
+#student-detail {
+    display: none;
+}
+
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+.tab button:hover {
+    background-color: #ddd;
+}
+
+.tab button.active-button {
+    background-color: #ccc;
+}
+
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+
+.active-tabcontent {
+    display: block;
+}
+
+.user-info-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.user-info-table th, .user-info-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.user-info-table th {
+    background-color: #f8f9fa;
+}
+
+.user-image {
+    max-width: 150px;
+    max-height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.container {
+    margin-top: 20px;
+}
+
+.table-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hidden {
+    display:none;
+}
+
+.unhide {
+    display: block;
+}
+
+#pi p {
+    margin:0;
+}
+
+.semester {
+    margin-top: 30px;
+}
+.semester-title {
+    margin-bottom: 20px;
+}

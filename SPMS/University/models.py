@@ -1,6 +1,7 @@
 from django.db import models
 
 from Students.models import StudentProfile
+from Faculties.models import FacultyProfile
 
 # Create your models here.
 class Courses(models.Model):
@@ -98,4 +99,18 @@ class StudentGrades(models.Model):
     SP = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
     course = models.ForeignKey(Courses, on_delete=models.CASCADE)
     grade = models.CharField(max_length=16,choices=GRADE_CHOICES, default="1.00")
+
+    def __str__(self):
+        return self.grade
+
+class Announcements(models.Model):
+    title = models.CharField(max_length=256)
+    content = models.TextField()
+    author = models.ForeignKey(FacultyProfile, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=False)
+    date_created = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
 

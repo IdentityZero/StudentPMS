@@ -9,7 +9,8 @@ from .models import (Courses,
                      Admissions,
                      Enrollments,
                      CoursesEnrolled,
-                     StudentGrades)
+                     StudentGrades,
+                     Announcements)
 
 # Register your models here.
 
@@ -32,6 +33,9 @@ class AdmissionsColumn(admin.ModelAdmin):
 class StudentGradesColumn(admin.ModelAdmin):
     list_display = ['SP','course']
 
+class AnnouncementColumn(admin.ModelAdmin):
+    list_display = ['title','author']
+
 
 admin.site.register(Courses, CoursesColumn)
 admin.site.register(CoursePrerequisite)
@@ -43,5 +47,6 @@ admin.site.register(Admissions, AdmissionsColumn)
 admin.site.register(Enrollments)
 admin.site.register(CoursesEnrolled)
 admin.site.register(StudentGrades, StudentGradesColumn)
+admin.site.register(Announcements, AnnouncementColumn)
 
 

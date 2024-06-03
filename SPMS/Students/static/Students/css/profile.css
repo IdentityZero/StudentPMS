@@ -1,0 +1,58 @@
+#personal-details {
+    padding:10px;
+    width: 30%;
+    height: 100%;
+    border-right: 2px solid gray;
+}
+
+.info-card {
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.user-image {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    margin-bottom: 20px;
+}
+
+
+.tab-buttons {
+    display: flex;
+  }
+  
+.tab-button {
+    background-color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    height: 40px;
+}
+
+.tab-button:hover {
+    background-color: #ddd;
+}
+
+.tab {
+    display: none;
+    height: 90%;
+    width: 100%;
+    padding: 20px;
+    background-color: #f0f0f0;
+}
+
+.active-tab-button {
+    background-color: #f0f0f0;
+    transform: scaleY(1.1);
+    transform-origin: bottom;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+}
+.emergency-contact {
+    color: red;
+    font-weight: bold;
+}

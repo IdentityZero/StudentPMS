@@ -1,0 +1,194 @@
+{% extends 'Faculties/faculty-base.html' %} 
+{% load static %}
+
+{% block page_title %}Student Profiles{% endblock %}
+{% block additionalLinks %}
+<link rel="stylesheet" href="{% static 'Faculties/css/student-profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div>
+    <h1 style="margin: 0;">Student List</h1>
+</div>
+<div class="main-content-container container">
+    <div id="student-list">
+        <div class="mb-1">
+            <button type="button" class="btn btn-success btn-sm">Add Student</button>
+        </div>
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Student ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Class</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for student in students %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td> <a href="#" onclick="openStudentDetails('{{ student.id }}'); retrievePersonalInformation('{{ student.id }}');retrieveStudentGrades('{{ student.id }}')"> {{ student.profile.user.username }}</a></td>
+                    <td>{{ student.profile.user.get_full_name }}</td>
+                    <td>{{ student.admission.curriculum }}</td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+
+    <div id="student-detail">
+        <div>
+            <a href="#" onclick="openStudentList()">Back</a>
+        </div>
+        <div class="tab">
+            <button class="tablinks" id="tab-btn-1" onclick="openTab(event, 'Tab1')">Personal Information</button>
+            <button class="tablinks" onclick="openTab(event, 'Tab2')">Grades</button>
+            <button class="tablinks" onclick="openTab(event, 'Tab3')">Family Records</button>
+            <button class="tablinks" onclick="openTab(event, 'Tab4')">Educational Background</button>
+        </div>
+        
+        <div id="Tab1" class="tabcontent container">
+            <div class="d-flex justify-content-end">
+                <div class="btn-group">
+                    <div id="pi-edit-mode" class="hidden">
+                        <button onclick="profileInfoSave()" class="btn btn-primary btn-sm" style="width: 80px;">Save</button>
+                        <button class="btn btn-danger btn-sm" onclick="profileInfoReadMode()" style="width: 80px;">Cancel</button>
+                    </div>
+                    <div id="pi-read-mode">
+                        <button onclick="profileInfoEditMode()" class="btn btn-primary btn-sm" style="width: 80px;">Edit</button>
+                        <button class="btn btn-danger btn-sm" style="width: 80px;">Delete</button>
+                    </div>
+                </div>
+            </div>
+            <div class="table-container" id="pi">
+                <img src="/media/profile_pics/profile.jpg" alt="User Image" class="user-image mb-3" id="pi-img">
+                <table class="user-info-table table table-striped">
+                    <tbody>
+                        <tr>
+                            <input type="hidden" id="pi-id">
+                            <th>Username/Student ID</th>
+                            <td id="pi-un">
+                                <p>Name</p>
+                                <input class="form-control" type="text">
+                            </td>
+                            <th>Full Name</th>
+                            <td id="pi-fln">
+                                <p>Name</p>
+                                <input class="form-control" disabled ="text">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>First Name</th>
+                            <td id="pi-fn">
+                                <p>Name</p>
+                                <input class="form-control" type="text">
+                            </td>
+                            <th>Last Name</th>
+                            <td id="pi-ln">
+                                <p>Name</p>
+                                <input class="form-control" type="text">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td id="pi-email">
+                                <p>Name</p>
+                                <input class="form-control" type="email">
+                            </td>
+                            <th>University Email</th>
+                            <td id="pi-univ-email">
+                                <p>Name</p>
+                                <input class="form-control" type="email">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Date of Birth</th>
+                            <td id="pi-dob">
+                                <p>Name</p>
+                                <input class="form-control" type="date">
+                            </td>
+                            <th>Contact Number</th>
+                            <td id="pi-contact">
+                                <p>Name</p>
+                                <input class="form-control" type="text">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Sex</th>
+                            <td id="pi-sex">
+                                <p>Name</p>
+                                <select name="Sex" class="form-select">
+                                    <option value="M">Male</option>
+                                    <option value="F">Female</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        <div id="Tab2" class="tabcontent container">
+
+            <div>
+
+                <div class="row" id="grade-id">
+                    
+                </div>
+
+            </div>
+
+        </div>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <div id="Tab3" class="tabcontent">
+            <h3>Family Records</h3>
+            <p>Some text for tab 3.</p>
+        </div>
+
+        <div id="Tab4" class="tabcontent">
+            <h3>Educational Background</h3>
+            <p>Some text for tab 3.</p>
+        </div>
+    </div>
+    
+</div>
+
+
+{% endblock %}
+
+
+{% block additionalScripts %}
+<script src="{% static 'Faculties/js/student-profiles.js' %}"></script>
+<script src="{% static 'Faculties/js/student-profiles-grades.js' %}"></script>
+{% endblock %}

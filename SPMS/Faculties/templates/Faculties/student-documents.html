@@ -1,0 +1,55 @@
+{% extends 'Faculties/faculty-base.html' %} 
+{% load static %}
+
+{% block page_title %}Student Profiles{% endblock %}
+{% block additionalLinks %}
+{% endblock %}
+
+{% block content %}
+<div>
+    <h1 style="margin: 0;">Student Documents</h1>
+</div>
+<div class="main-content-container container">
+    
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Student</th>
+                <th>File Type</th>
+                <th>File</th>
+                <th>Description</th>
+                <th>Last Modified</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for docs in documents %}
+                <tr>
+                    <td>{{ docs.SP.profile.user.get_full_name }}</td>
+                    <td>{{ docs.SD_doc_type }}</td>
+
+                    {% if docs.SD_document %}
+                        <td><a href="{{ docs.SD_document.url }}" target="_blank">{{ docs.SD_document }}</a></td>
+                    {% else %}
+                        <td>None</td>
+                    {% endif %}
+
+                    <td>{{ docs.SD_doc_type.description }}</td>
+                    <td>{{ docs.SD_date_uploaded }}</td>
+                    <td class="text-center" style="font-size: 20px;">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#edit-docs-{{ docs.id }}" class="text-primary mr-2"><i class='bx bx-edit'></i></a>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#del-docs-{{ docs.id }}" class="text-danger"><i class='bx bx-trash'></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+</div>
+
+
+{% endblock %}
+
+
+{% block additionalScripts %}
+{% endblock %}

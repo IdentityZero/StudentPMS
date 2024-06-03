@@ -1,6 +1,11 @@
 {% extends 'Students/student-base.html' %} 
+{% load crispy_forms_tags %}
 {% load static %}
 {% block page_title %}My Profile{% endblock %}
+
+{% block additionalLinks %}
+<link rel="stylesheet" href="{% static 'Students/css/profile.css' %}">
+{% endblock %}
 
 {% block content %}
     {% if messages %}
@@ -11,130 +16,279 @@
         </ul>
     {% endif %}
 
-    <div>
-        <h1>Student PROFILE Page</h1>
-        <div>
-            <h2>Student Profile Details</h2>
-            First Name: {{ user.first_name }} <br>
-            Last Name: {{ user.last_name }} <br>
-            Email: {{ user.email }} <br>
-            Date of Birth: {{ user.usersprofile.user_date_of_birth }} <br>
-            Sex: {{ user.usersprofile.user_sex }} <br>
-            Contact Number: {{ user.usersprofile.user_contact_number }} <br>
-        </div>
-        <div>
-            <h2>Edit Profile</h2>
-            <form method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ user_form }}
-                {{ baseProf_form }}
-                <input type="submit" value="Save Changes">
-            </form>
-        </div>
-        <hr>
-        <hr>
-    </div>
-
-    <div>
-        <h2>Family Records</h2>
-        <div>
-            {% for fam in family_records %}
-            <div>
-                Relationship: {{fam.SP_relationship}} <br>
-                Firstname: {{fam.SP_fam_first_name}} <br>
-                Lastname: {{fam.SP_fam_last_name}} <br>
-                Contact Number: {{fam.SP_fam_contact_number}} <br>
-                Emergency Contact: {{fam.SP_fam_emergency_contact}} <hr>
+    <h1>My Profile</h1>
+    <div class="main-content-container row">
+        <div id="personal-details" class="col-4">
+            <div class="container">
+                <div class="card info-card shadow-sm">
+                    <div class="card-body text-center">
+                        <img src="{{ user.usersprofile.user_profile_picture.url }}" alt="User Image" class="user-image">
+                        <h4 class="card-title">{{ user.get_full_name }}</h4>
+                        <p class="card-text"><strong>Username:</strong> {{ user.username }}</p>
+                        <p class="card-text"><strong>Email:</strong> {{ user.email }}</p>
+                        <p class="card-text"><strong>Sex:</strong> {{ user.usersprofile.user_sex }}</p>
+                        <p class="card-text"><strong>Phone:</strong> {{user.usersprofile.user_contact_number}}</p>
+                        <p class="card-text"><strong>Date of Birth:</strong> {{user.usersprofile.user_date_of_birth}}</p>
+                        <button class="btn btn-primary mt-2 btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit</button>
+                    </div>
+                </div>
             </div>
-            {% endfor %}
-        </div>
-        <div>
-            <h3>Edit Family Member Records</h3>
-            {% for form in editFamily_form %}
-                <form method="POST">
-                    {% csrf_token %}
-                    <input type="hidden" name="pk" value="{{ form.instance.pk }}">
-                    {% if form.errors %}
-                        <ul class="errorlist">
-                            {% for field in form %}
-                                {% for error in field.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                    {{ form }}
+            <div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5">Edit Personal Information</h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form method="POST" enctype="multipart/form-data">
+
+                        <div class="modal-body">
+                            {% csrf_token %}
+                            {{ user_form|crispy }}
+                            {{ baseProf_form|crispy }}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                          </div>
+                    </form>
                     
-                    <input type="submit" value="Save Changes">
-                </form>
-                <br>
-            {% endfor %}
-        </div>
-        <hr>
-
-        <div>
-            <h3>Add Family Members</h3>
-            <form method="POST">
-                {% csrf_token %}
-                {{ addFamily_form }}
-                <input type="submit" value="Add Family Members">
-            </form>
+                  </div>
+                </div>
+              </div>
         </div>
 
-        <hr>
-        <hr>
+        <div class="col-8">
 
-    </div>
-
-    <div>
-        <h1>Educational Background</h1>
-        <div>
-            <div>
-                <h2>Educational Background Details</h2>
-                {% for qs in educBg_qs %}
-                    Level: {{ qs.SP_education_level }} <br>
-                    Institution: {{ qs.SP_institution }} <br>
-                    Address: {{ qs.SP_address }} <br>
-                    Description: {{ qs.SP_description }} <br>
-                    Graduated/Last Year Attended: {{ qs.SP_last_year_attended }} <hr>
-                {% endfor %}
+            <div class="tab-buttons">
+                <button class="tab-button active-tab-button" onclick="toggleTab(0)">Family Records</button>
+                <button class="tab-button" onclick="toggleTab(1)">Educational Background</button>
             </div>
 
-            <div>
-                <h2>Edit Educational Background Details</h2>
-                {% for form in editEducBg_fs %}
-                <form method="POST">
-                    {% csrf_token %}
-                    <input type="hidden" name="pk" value="{{ form.instance.pk }}">
-                    {% if form.errors %}
-                        <ul class="errorlist">
-                            {% for field in form %}
-                                {% for error in field.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                    {{ form }}
+            <div class="tab" id="tab1">
+                <div class="container mb-2">
+                    <div class="row">
+                        <div class="col text-start">
+                            <h4>Family Records</h4>
+                        </div>
+                        <div class="col text-end">
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#AddNewMembersModal">
+                                Add Members
+                            </button>
+                        </div>
+
+                        <div class="modal fade" id="AddNewMembersModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form method="POST">
+                                    <div class="modal-body">
+                                        {% csrf_token %}
+                                        {{ addFamily_form|crispy }}
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                      <button type="submit" class="btn btn-primary">Save changes</button>
+                                    </div>
+                                </form>
+                              </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="accordion" id="familyAccordion">
+
+                    {% for fam in family_records %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            {% if forloop.counter == 1 %}
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ fam.id }}" aria-expanded="true" aria-controls="collapse-{{ fam.id }}">
+                            {% else %}
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ fam.id }}" aria-expanded="false" aria-controls="collapse-{{ fam.id }}">
+                            {% endif %}
+                                {{fam.SP_fam_first_name}} {{fam.SP_fam_last_name}}
+                            </button>
+                        </h2>
+                        {% if forloop.counter == 1 %}
+                            <div id="collapse-{{ fam.id }}" class="accordion-collapse show collapse" data-bs-parent="#familyAccordion">
+                        {% else %}
+                            <div id="collapse-{{ fam.id }}" class="accordion-collapse collapse" data-bs-parent="#familyAccordion">
+                        {% endif %}
+                            <div class="accordion-body">
+                                <div class="row mb-2">
+                                    <div class="col-sm-4">
+                                        <strong>Relationship:</strong> {{fam.SP_relationship}}
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <strong>Name:</strong> {{fam.SP_fam_first_name}} {{fam.SP_fam_last_name}}
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <strong>Contact Number:</strong> {{fam.SP_fam_contact_number}}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <strong>Emergency Contact:</strong> 
+                                        <span class="emergency-contact">{{fam.SP_fam_emergency_contact}}</span>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <button class="btn btn-primary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#editModal-{{ fam.id }}">Edit</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    {% for form in editFamily_form %}
+                    <div class="modal fade" id="editModal-{{ form.instance.pk }}" tabindex="-1"aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Edit Family Members</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form method="POST">
+                                    <div class="modal-body">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="pk" value="{{ form.instance.pk }}">
+                                        {% if form.errors %}
+                                            <ul class="errorlist">
+                                                {% for field in form %}
+                                                    {% for error in field.errors %}
+                                                        <li>{{ error }}</li>
+                                                    {% endfor %}
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                        {{ form|crispy }}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+            
+            <div class="tab" id="tab2">
+                <div class="container mb-2">
+                    <div class="row">
+                        <div class="col text-start">
+                            <h4>Educational Background</h4>
+                        </div>
+                        <div class="col text-end">
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addNewEducationBgModal">
+                                Add Education Background
+                            </button>
+                        </div>
+
+                        <div class="modal fade" id="addNewEducationBgModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form method="POST">
+                                    <div class="modal-body">
+                                        {% csrf_token %}
+                                        {{ addEducBg_form|crispy }}
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                      <button type="submit" class="btn btn-primary">Save changes</button>
+                                    </div>
+                                </form>
+                              </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center">
+
+                    {% for qs in educBg_qs %}
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                {{ qs.SP_education_level }}
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <strong>Institution:</strong> {{ qs.SP_institution }}
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Address:</strong> {{ qs.SP_address }}
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Description:</strong> {{ qs.SP_description }}
+                                </div>
+                                <div>
+                                    <strong>Year Graduated/Last Year Attended:</strong> {{ qs.SP_last_year_attended }}
+                                </div>
+                                <div>
+                                    <button class="btn btn-primary mt-2 btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#edit-educ-bg-{{ qs.id}}">Edit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    {% for form in editEducBg_fs %}
+                    <div class="modal fade" id="edit-educ-bg-{{form.instance.pk}}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h1 class="modal-title fs-5">Edit Educational Background</h1>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form method="POST" enctype="multipart/form-data">
+        
+                                <div class="modal-body">
+                                    {% csrf_token %}
+                                    {% if form.errors %}
+                                        <ul class="errorlist">
+                                            {% for field in form %}
+                                                {% for error in field.errors %}
+                                                    <li>{{ error }}</li>
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                    {{ form|crispy }}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                  </div>
+                            </form>
+                            
+                          </div>
+                        </div>
+                    </div>
+                    {% endfor %}
                     
-                    <input type="submit" value="Save Changes">
-                </form>
-                <br>
-            {% endfor %}
+
+                </div>
             </div>
 
-            <hr>
-
-            <div>
-                <h2>Add Educational Background</h2>
-                <form method="POST">
-                    {% csrf_token %}
-                    {{ addEducBg_form }}
-                    <input type="submit" value="Add Educational Background">
-                </form>
-            </div>
-
+            
         </div>
+
     </div>
     
+    {% block additionalScripts %}
+    <script src="{% static 'Students/js/profile.js' %}"></script>
+    {% endblock %}
 {% endblock %}
