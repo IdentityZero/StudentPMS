@@ -10,7 +10,7 @@
     <h1 style="margin: 0;">Student Documents</h1>
 </div>
 <div class="main-content-container container">
-    <div class="mb-2 d-flex align-items-center container" style="max-height: 50px; width: 80%;">
+    <div class="mb-2 d-flex align-items-center container">
         
         <input type="text" id="username-filter" class="form-control me-2" placeholder="Username">
 
@@ -40,7 +40,8 @@
             <option value="30">1 month ago</option>
         </select>
 
-        <button id="filter-button" class="btn btn-primary">Filter</button>
+        <button id="filter-button" class="btn btn-primary me-2">Filter</button>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNewTypeModal" style="white-space: nowrap; margin-left: 5px;">+ Type</button>
     </div>
     
     <table class="table table-bordered table-striped">
@@ -58,20 +59,20 @@
         <tbody id="document-container">
             {% for docs in documents %}
                 <tr>
-                    <td>{{ docs.SP.profile.user.get_full_name }}</td>
+                    <td id="doc-name-{{docs.id}}">{{ docs.SP.profile.user.get_full_name }}</td>
                     <td id="doc-type-{{docs.id}}" data-value="{{ docs.SD_doc_type.id }}">{{ docs.SD_doc_type }}</td>
 
                     {% if docs.SD_document %}
                         <td><a id="doc-file-{{docs.id}}" href="{{ docs.SD_document.url }}" target="_blank">{{ docs.SD_document }}</a></td>
                     {% else %}
-                        <td>None</td>
+                        <td><a id="doc-file-{{docs.id}}" href=""></a></td>
                     {% endif %}
 
-                    <td>{{ docs.SD_doc_type.description }}</td>
+                    <td id="doc-description-{{docs.id}}">{{ docs.SD_doc_type.description }}</td>
                     <td id="doc-comment-{{docs.id}}">{{ docs.SD_comment }}</td>
-                    <td>{{ docs.SD_date_uploaded }}</td>
+                    <td id="doc-date-{{docs.id}}">{{ docs.SD_date_uploaded }}</td>
                     <td class="text-center" style="font-size: 20px;">
-                        <a href="#" name="doc-edit-btn" data-bs-toggle="modal" data-bs-target="#doc-edit-form" id="doc-edit-btn-{{docs.id}}" class="text-primary mr-2"><i class='bx bx-edit'></i></a>
+                        <a href="#" name="doc-edit-btn" data-bs-toggle="modal" data-bs-target="#doc-edit-formModal" id="doc-edit-btn-{{docs.id}}" class="text-primary mr-2"><i class='bx bx-edit'></i></a>
                         <a href="#" class="text-danger"><i class='bx bx-trash'></i></a>
                     </td>
                 </tr>
@@ -79,19 +80,25 @@
         </tbody>
     </table>
 
-    <div class="modal fade" id="doc-edit-form" tabindex="-1" aria-hidden="true">
+
+
+
+
+
+
+    <div class="modal fade" id="doc-edit-formModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
             <h1 class="modal-title fs-5">Edit Document</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form enctype="multipart/form-data">
+            <form enctype="multipart/form-data" id="doc-edit-form">
+                <input type="hidden" id="doc-edit-id">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="documentType" class="form-label">Document Type</label>
                         <select class="form-select me-2" id="doc-edit-type">
-                            <option value="0">Type</option>
                             {% for document_type in document_types %}
                             <option value="{{document_type.pk}}">{{document_type.document_type}}</option>
                             {% endfor %}
@@ -101,17 +108,17 @@
                         <span class="input-group-text">Currently</span>
                         <div class="form-control d-flex h-auto">
                             <span class="text-break flex-grow-1"> 
-                                <a id="doc-edit-file" href="" target="_blank">documents/chapter-1_1_TMwoIxY.docx</a>
+                                <a href="" id="current-file" target="_blank"></a>
                             </span>
                             <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="noFile" name="noFile">
-                                <label class="form-check-label" for="noFile">Clear</label>
+                                <input type="checkbox" class="form-check-input" id="edit-doc-clear" name="noFile">
+                                <label class="form-check-label" for="edit-doc-clear">Clear</label>
                             </div>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label for="file" class="form-label">Choose File</label>
-                        <input type="file" class="form-control" name="file">
+                        <input type="file" id="doc-edit-file" class="form-control" name="file">
                     </div>
                     
                     <div class="mb-3">
@@ -121,14 +128,52 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
                 </div>
             </form>
         </div>
         </div>
     </div>
     
+
+
+
+
+
+
+
+
+
+
+    <div class="modal fade" id="addNewTypeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">New Document Type</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addNewTypeForm">
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label for="addNewType" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="addNewType" name="name" placeholder="Enter Document Type" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addNewDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="addNewDescription" name="description" rows="3" placeholder="Enter a description"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
 </div>
+
 
 
 {% endblock %}

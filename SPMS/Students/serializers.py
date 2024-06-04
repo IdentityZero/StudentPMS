@@ -5,7 +5,7 @@ from Users.models import UsersProfile
 class DocumentTypesSerializer(serializers.ModelSerializer):
     class Meta:
         model = DocumentTypes
-        fields = ['document_type', 'description']
+        fields = ['id','document_type', 'description']
 
 class UsersProfileSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()

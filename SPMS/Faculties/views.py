@@ -15,7 +15,7 @@ from .models import FacultyProfile
 
 from Users.models import UsersProfile
 from Students.models import StudentProfile,StudentDocuments,StudentFamilyRecords,StudentEducationalBackground,DocumentTypes
-from Students.serializers import StudentDocumentsSerializer
+from Students.serializers import StudentDocumentsSerializer,DocumentTypesSerializer
 from University.models import Admissions,CurriculumCourses, StudentGrades,Courses
 
 # Create your views here.
@@ -87,6 +87,72 @@ def retrieveStudentDocuments(request):
 
     serializer = StudentDocumentsSerializer(documents, many=True)
     return JsonResponse(serializer.data, safe=False)
+
+
+@csrf_exempt
+def updateDocument(request):
+    res = {}
+
+    data = request.POST
+    file = request.FILES
+
+    id = int(data['id'])
+    type = int(data['type'])
+    comment = data['comment']
+    clear = data['clear']
+
+    # Get Document instance
+    document = StudentDocuments.objects.get(pk=id)
+    document_type = DocumentTypes.objects.get(pk=type)
+
+    document.SD_doc_type = document_type
+    document.SD_comment = comment
+
+    if clear == "true":
+        document.SD_document.delete()
+        document.SD_document = None
+    
+    if file:
+        document.SD_document = file['file']
+
+    document.save()
+    serializer = StudentDocumentsSerializer(document)
+
+    res['message'] = "OK"
+    res['updated'] = serializer.data
+    return JsonResponse(res, status=200)
+    
+
+
+
+
+
+
+
+@csrf_exempt
+def addNewDocumentType(request):
+    res = {}
+
+    data = request.body
+    data = json.loads(data)
+
+    # unpack data
+    type = data['type']
+    description = data['description']
+
+    try:
+        DocumentTypes.objects.create(document_type=type, description=description)
+        res['success'] = ["OK"]
+    except IntegrityError:
+
+        res['error'] = "Document Type Already exists!"
+    
+    type= DocumentTypes.objects.all()
+
+    serializer = DocumentTypesSerializer(type, many=True)
+    res['updated'] = serializer.data 
+
+    return JsonResponse(res, status=200)
 
 
 def retrieveStudentProfile(request):
