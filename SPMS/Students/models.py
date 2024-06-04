@@ -58,5 +58,6 @@ class StudentDocuments(models.Model):
     SD_doc_type = models.ForeignKey(DocumentTypes, models.DO_NOTHING)
     SD_document = models.FileField(upload_to="documents", blank=True, null=True)
     SD_date_uploaded = models.DateTimeField(auto_now=True)
+    SD_comment = models.TextField(blank=True, null=True)
 
 

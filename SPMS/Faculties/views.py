@@ -6,14 +6,16 @@ from django.db import IntegrityError
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 
-from datetime import date
+from datetime import date, timedelta
 import json
 
 from .models import FacultyProfile
 
 from Users.models import UsersProfile
-from Students.models import StudentProfile,StudentDocuments
+from Students.models import StudentProfile,StudentDocuments,StudentFamilyRecords,StudentEducationalBackground,DocumentTypes
+from Students.serializers import StudentDocumentsSerializer
 from University.models import Admissions,CurriculumCourses, StudentGrades,Courses
 
 # Create your views here.
@@ -50,11 +52,41 @@ def student_documents(request):
     context = {}
 
     documents = StudentDocuments.objects.all()
-    print(documents.first().SP)
+    document_types = DocumentTypes.objects.all()
 
     context['documents'] = documents
+    context['document_types'] = document_types
 
     return render(request, 'Faculties/student-documents.html', context)
+
+
+def retrieveStudentDocuments(request):
+    res = {}
+
+    documents = StudentDocuments.objects.all()
+
+    if 'username' in request.GET:
+        username = request.GET['username']
+        students = StudentProfile.objects.filter(profile__user__username__icontains=username)
+        documents = documents.filter(SP__in=students)
+        
+    if 'type' in request.GET:
+        type = request.GET['type']
+        doc_type = DocumentTypes.objects.get(pk=type)
+        documents = documents.filter(SD_doc_type=doc_type)
+    
+    if 'ext' in request.GET:
+        ext = f".{request.GET['ext']}"
+        documents = documents.filter(SD_document__endswith=ext)
+
+    if 'date' in request.GET:
+        date = int(request.GET['date'])
+        date_filter = (timezone.now() - timedelta(days=date)).date()
+        documents = documents.filter(SD_date_uploaded__date=date_filter)
+
+
+    serializer = StudentDocumentsSerializer(documents, many=True)
+    return JsonResponse(serializer.data, safe=False)
 
 
 def retrieveStudentProfile(request):
@@ -140,6 +172,116 @@ def updateStudentPersonalInformation(request):
     }
 
 
+    return JsonResponse(res, status=200)
+
+
+def retrieveStudentFamilyRecords(request):
+    res ={}
+
+    # Get student profile
+    id = int(request.GET['id'])
+    student_profile = StudentProfile.objects.get(id=id)
+    res['id'] = id
+
+    fam_records = StudentFamilyRecords.objects.filter(SP=student_profile)
+    fam_records_arr = []
+
+    for record in fam_records:
+        fam_record_dict = {
+            "id": record.id,
+            "relationship": record.SP_relationship,
+            "first_name": record.SP_fam_first_name,
+            "last_name": record.SP_fam_last_name,
+            "contact": record.SP_fam_contact_number,
+            "emergency_contact": record.SP_fam_emergency_contact
+        }
+        fam_records_arr.append(fam_record_dict)
+    
+    res['results'] = fam_records_arr
+    return JsonResponse(res, status=200)
+
+
+@csrf_exempt
+def addStudentFamilyRecords(request):
+    res = {}
+
+    data = request.body
+    data = json.loads(data)
+
+    # unpack data
+    id = int(data['id'])
+    relationship = data['relationship']
+    contact = data['contact']
+    first_name = data['first_name']
+    last_name = data['last_name']
+    emergency = data['emergency']
+    if emergency == "true":
+        emergency = True
+    else:
+        emergency = False
+    
+    student_profile_ins = StudentProfile.objects.get(pk=id)
+
+    record =StudentFamilyRecords.objects.create(
+        SP=student_profile_ins,
+        SP_relationship=relationship,
+        SP_fam_first_name=first_name,
+        SP_fam_last_name=last_name,
+        SP_fam_contact_number = contact,
+        SP_fam_emergency_contact=emergency
+    )
+
+    record.save()
+    res['success'] = "OK"
+    return JsonResponse(res, status=200)
+
+@csrf_exempt
+def updateStudentFamilyRecords(request):
+    # this end point will receive
+    # relationship, first name, last name, contact number, and emergency
+    res = {}
+
+    data = request.body
+    data = json.loads(data)
+
+    # unpack data
+    id = int(data['id'])
+    relationship = data['relationship']
+    contact = data['contact']
+    first_name = data['first_name']
+    last_name = data['last_name']
+    emergency = data['emergency']
+    if emergency == "true":
+        emergency = True
+    else:
+        emergency = False
+
+    record =StudentFamilyRecords.objects.get(pk=id)
+
+    record.SP_relationship = relationship
+    record.SP_fam_first_name = first_name
+    record.SP_fam_last_name = last_name
+    record.SP_fam_contact_number = contact
+    record.SP_fam_emergency_contact = emergency
+    record.save()
+
+    res['success'] = "OK"
+    return JsonResponse(res, status=200)
+
+
+@csrf_exempt
+def deleteStudentFamilyRecords(request):
+    # This endpoint will receive an id of the family record
+    res = {}
+    data = request.body
+    data = json.loads(data)
+
+    # unpack data
+    id = int(data['id'])
+    record =StudentFamilyRecords.objects.get(pk=id)
+    record.delete()
+
+    res['success'] = "OK"
     return JsonResponse(res, status=200)
 
 
@@ -234,14 +376,12 @@ def addEditStudentGrades(request):
 
     if grade_ins:
         # update
-        print("Update")
+
         grade_ins = grade_ins.first()
-        print(grade_ins.course.course_name)
         grade_ins.grade = grade
         grade_ins.save()
     else:
         # Create
-        print("Create")
         newGrade = StudentGrades.objects.create(SP=student,course=course,grade=grade)
         newGrade.save()
 
@@ -250,4 +390,103 @@ def addEditStudentGrades(request):
     return JsonResponse(res,status=200)
 
 
+def retrieveStudentEducationBG(request):
+    res = {}
+    id = int(request.GET['id'])
+    student_profile = StudentProfile.objects.get(id=id)
+    res['id'] = id
+
+    educ_records = StudentEducationalBackground.objects.filter(SP=student_profile)
+    educ_records_arr = []
+
+    for record in educ_records:
+        educ_record_dict = {
+            "id": record.id,
+            "level": record.SP_education_level,
+            "institution": record.SP_institution,
+            "address": record.SP_address,
+            "description" : record.SP_description,
+            "year": record.SP_last_year_attended
+        }
+        educ_records_arr.append(educ_record_dict)
+    
+    res['results'] = educ_records_arr
+
+
+    return JsonResponse(res, status=200)
+
+@csrf_exempt
+def addStudentEducationBG(request):
+    res = {}
+
+    data = request.body
+    data = json.loads(data)
+
+    # unpack data
+    id = int(data['id'])
+    level = data['level']
+    institution = data['institution']
+    address = data['address']
+    description = data['description']
+    year = int(data['year'])
+
+    student_profile_ins = StudentProfile.objects.get(pk=id)
+
+    record = StudentEducationalBackground.objects.create(
+        SP=student_profile_ins,
+        SP_education_level=level,
+        SP_institution=institution,
+        SP_address=address,
+        SP_description=description,
+        SP_last_year_attended=year,
+    )
+
+    record.save()
+
+    res['success'] = "OK"
+    return JsonResponse(res, status=200)
+
+@csrf_exempt
+def updateStudentEducationBG(request):
+    # This endpoint will accept
+    # level, institution, address, description, year
+    res = {}
+
+    data = request.body
+    data = json.loads(data)
+
+    # unpack data
+    id = int(data['id'])
+    level = data['level']
+    institution = data['institution']
+    address = data['address']
+    description = data['description']
+    year = int(data['year'])
+
+    record =StudentEducationalBackground.objects.get(pk=id)
+
+    record.SP_education_level = level
+    record.SP_institution = institution
+    record.SP_address = address
+    record.SP_description = description
+    record.SP_last_year_attended = year
+    record.save()
+
+    res['success'] = "OK"
+    return JsonResponse(res, status=200)
+
+
+@csrf_exempt
+def deleteStudentEducationBG(request):
+    res = {}
+    data = request.body
+    data = json.loads(data)
+
+    # unpack data
+    id = int(data['id'])
+    record =StudentEducationalBackground.objects.get(pk=id)
+    record.delete()
+
+    res['success'] = "OK"
+    return JsonResponse(res, status=200)
 

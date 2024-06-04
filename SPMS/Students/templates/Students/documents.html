@@ -54,6 +54,7 @@
                             <th scope="col">File Type</th>
                             <th scope="col">Current File</th>
                             <th scope="col">Description</th>
+                            <th scope="col">Comments</th>
                             <th scope="col">Last Modified</th>
                             <th scope="col" style='width: 100px;'>Actions</th>
                         </tr>
@@ -71,6 +72,7 @@
                             {% endif %}
 
                             <td>{{ docs.SD_doc_type.description }}</td>
+                            <td>{{ docs.SD_comment }}</td>
                             <td>{{ docs.SD_date_uploaded }}</td>
                             <td class="text-center" style="font-size: 20px;">
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#edit-docs-{{ docs.id }}" class="text-primary mr-2"><i class='bx bx-edit'></i></a>

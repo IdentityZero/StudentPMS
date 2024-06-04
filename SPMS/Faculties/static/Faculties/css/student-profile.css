@@ -88,3 +88,67 @@
 .semester-title {
     margin-bottom: 20px;
 }
+
+.fam-profile-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+.fam-profile-header {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.fam-profile-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+.fam-profile-details {
+    padding: 10px;
+}
+.fam-profile-details .row + .row {
+    margin-top: 5px;
+}
+.fam-profile-actions {
+    padding: 10px;
+    text-align: right;
+}
+.fam-profile-actions button {
+    margin-left: 5px;
+    padding: 5px 10px;
+    font-size: 0.875rem;
+}
+
+.education-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    position: relative;
+}
+.education-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.education-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.education-header h5 {
+    margin: 0;
+}
+.education-card-actions {
+    position: absolute;
+    bottom: 0px;
+    right: 20px;
+    margin-bottom: 5px;
+}
+.education-card-actions button {
+    margin-left: 5px;
+}
