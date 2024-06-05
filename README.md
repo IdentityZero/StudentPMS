@@ -12,5 +12,7 @@ Mac/Linux:
   ``` pip install -r requirements.txt```
 ## 5. Change directory
   ``` cd SPMS ```
-## 6. Start the server
+## 6. Migrate Database
+  ``` python manage.py migrate```
+## 7. Start the server
   ``` python manage.py runserver```
