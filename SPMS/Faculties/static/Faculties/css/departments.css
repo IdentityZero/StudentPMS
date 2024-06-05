@@ -1,0 +1,35 @@
+.category-card {
+    position: relative;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+.category-card:hover {
+    transform: scale(1.05);
+}
+.category-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #007bff;
+    padding: 10px;
+    border-radius: 10px 10px 0 0;
+    min-height: 60px;
+}
+
+.subcategories {
+    width: 80%;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 10px;
+}
+.list-group-item {
+    border: none;
+    padding: 5px 10px;
+    background-color: transparent;
+    cursor: pointer;
+}
+.list-group-item:not(:last-child) {
+    border-bottom: 1px solid #dee2e6;
+}

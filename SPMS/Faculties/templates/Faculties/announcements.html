@@ -1,0 +1,132 @@
+{% extends 'Faculties/faculty-base.html' %} 
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}Departments{% endblock %}
+{% block additionalLinks %}
+<link rel="stylesheet" href="{% static 'Faculties/css/Announcements.css' %}">
+{% endblock %}
+
+{% block content %}
+<div>
+    <h1 style="margin: 0;">Announcements</h1>
+</div>
+
+<div class="main-content-container container">
+    <div class="mb-3 d-flex align-items-center container">
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#newAnnouncementModal">+ Announcement</button>
+    </div>
+
+    <div class="row container justify-content-center" id="departments-container">
+
+        <div class="col-md-12">
+            <table class="announcement-table table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Content</th>
+                        <th>Author</th>
+                        <th>Date Created</th>
+                        <th>Active</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for announcement in announcements%}
+                    <tr>
+                        <td style="font-weight: bold;" id="d-title-{{announcement.id}}">{{ announcement.title }}</td>
+                        <td id="d-content-{{announcement.id}}">{{ announcement.content }}</td>
+                        <td id="d-author-{{announcement.id}}" >{{announcement.author.profile.user.get_full_name}}</td>
+                        <td id="d-date-{{announcement.id}}">{{announcement.date_created}}</td>
+                        <td style="font-weight: bold; color:red;" id="d-active-{{announcement.id}}">{{announcement.is_active}}</td>
+                        <td class="font-weight-bold">
+                            <a onclick="editAnnouncement('{{announcement.id}}')" href="#" data-bs-toggle="modal" data-bs-target="#editAnnouncementModal" class="text-primary mr-2 centered-icon-text">
+                                <i class='bx bx-edit'></i>
+                                <span class="text-center">Edit</span>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                    
+                </tbody>
+            </table>
+        </div>
+
+
+
+    </div>
+</div>
+
+
+<div class="modal fade" id="editAnnouncementModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5">New Announcement</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="editAnnouncementForm">
+
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="title-form" class="form-label">Title</label>
+                    <input type="text" class="form-control" id="title-form" value="Announcement Title">
+                </div>
+                <div class="mb-3">
+                    <label for="content-form" class="form-label">Content</label>
+                    <textarea class="form-control" id="content-form" rows="5">Announcement Content</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="active-form" class="form-label">Active</label>
+                    <select class="form-select" id="active-form">
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+            
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="editAnnouncementSavebutton" data-value="" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+<div class="modal fade" id="newAnnouncementModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5">New Announcement</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="POST">
+
+            <div class="modal-body">
+            {% csrf_token %}
+            {{ form|crispy}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Add Announcement</button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+
+{% block additionalScripts %}
+<script src="{% static 'Faculties/js/announcements.js' %}"></script>
+{% endblock %}
