@@ -1,7 +1,7 @@
 {% extends 'Faculties/faculty-base.html' %} 
 {% load static %}
 
-{% block page_title %}Student Profiles{% endblock %}
+{% block page_title %}Student Documents{% endblock %}
 {% block additionalLinks %}
 {% endblock %}
 
@@ -12,7 +12,7 @@
 <div class="main-content-container container">
     <div class="mb-2 d-flex align-items-center container">
         
-        <input type="text" id="username-filter" class="form-control me-2" placeholder="Username">
+        <input type="text" id="username-filter" class="form-control me-2" placeholder="Name">
 
         <select class="form-select me-2" id="type-filter">
             <option value="0">Type</option>
@@ -72,13 +72,39 @@
                     <td id="doc-comment-{{docs.id}}">{{ docs.SD_comment }}</td>
                     <td id="doc-date-{{docs.id}}">{{ docs.SD_date_uploaded }}</td>
                     <td class="text-center" style="font-size: 20px;">
-                        <a href="#" name="doc-edit-btn" data-bs-toggle="modal" data-bs-target="#doc-edit-formModal" id="doc-edit-btn-{{docs.id}}" class="text-primary mr-2"><i class='bx bx-edit'></i></a>
-                        <a href="#" class="text-danger"><i class='bx bx-trash'></i></a>
+                        <a href="#" name="doc-edit-btn" data-bs-toggle="modal" data-bs-target="#doc-edit-formModal" id="doc-edit-btn-{{docs.id}}" class="text-primary mr-2 centered-icon-text">
+                            <i class='bx bx-edit'></i>
+                            <span class="text-center">Edit</span>
+                        </a>
+                        <a name="doc-del-btn" id="doc-edit-btn-{{docs.id}}" data-bs-toggle="modal" data-bs-target="#doc-del-formModal"  href="#" class="text-danger centered-icon-text"">
+                            <i class='bx bx-trash'></i>
+                            <span class="text-center">Delete</span>
+                        </a>
                     </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+
+
+
+    <div class="modal fade" id="doc-del-formModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5">Delete Document</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" onclick="deleteDocument(this)" id="documentDelBtn" data-value="1" class="btn btn-danger">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
 
 

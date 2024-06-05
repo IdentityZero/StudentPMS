@@ -1,5 +1,6 @@
 {% extends 'Faculties/faculty-base.html' %} 
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block page_title %}Student Profiles{% endblock %}
 {% block additionalLinks %}
@@ -10,11 +11,35 @@
 <div>
     <h1 style="margin: 0;">Student List</h1>
 </div>
+
 <div class="main-content-container container">
     <div id="student-list">
         <div class="mb-1">
-            <button type="button" class="btn btn-success btn-sm">Add Student</button>
+            <button type="button" data-bs-toggle="modal" data-bs-target="#newStudentModal" class="btn btn-success btn-sm">Add Student</button>
         </div>
+        <div class="modal fade" id="newStudentModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="exampleModalLabel">Add New Student</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div>
+                    
+                </div>
+                <form method="POST">
+                    <div class="modal-body">
+                        {% csrf_token%}
+                        {{form | crispy}}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add</button>
+                    </div>
+                </form>
+              </div>
+            </div>
+          </div>
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>
@@ -131,24 +156,12 @@
             </div>
         </div>
         
-
         <div id="Tab2" class="tabcontent container">
             <div>
                 <div class="row" id="grade-id">
                 </div>
             </div>
         </div>
-        
-
-
-
-
-
-
-
-
-
-
 
         <div id="Tab3" class="tabcontent container">
             <div class="text-end mb-2">
@@ -220,8 +233,6 @@
                 </div>
             </div>
         </div>
-
-
 
         <div id="Tab4" class="tabcontent container">
             <div class="text-end mb-2">

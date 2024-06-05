@@ -37,3 +37,12 @@ function deleteDocument (doc_id) {
           alert('Cannot do this process right now! Try again later')
         });
 }
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    console.log(tooltipTriggerEl)
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+});

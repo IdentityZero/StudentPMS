@@ -402,3 +402,13 @@ body.shrink .tooltip {
   border: 1px solid rgba(0, 0, 0, 0.125);
 }
 
+
+.centered-icon-text {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  flex-direction: row;
+}
+.centered-icon-text span {
+  font-size: 10px;
+}

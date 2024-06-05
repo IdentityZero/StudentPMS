@@ -37,7 +37,7 @@ from University.models import Admissions,CurriculumCourses, StudentGrades, Annou
 @login_required
 def home(request):
 
-    announcements = Announcements.objects.filter(is_active=True)
+    announcements = Announcements.objects.filter(is_active=True).order_by('-date_created')
 
     context= {'announcements':announcements}
     user = request.user

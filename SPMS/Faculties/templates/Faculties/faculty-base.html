@@ -24,8 +24,8 @@
       
           <div class="sidebar-links">
             <ul style="padding:0;">
-              <li class="tooltip-element active-link" data-tooltip="0">
-                <a href="{% url 'faculty-home' %}" class="active" data-active="0">
+              <li style="display:none" class="tooltip-element active-link" data-tooltip="0">
+                <a href="{% url 'faculty-student-profiles' %}" class="active" data-active="0">
                   <div class="icon">
                     <i class='bx bx-home'></i>
                     <i class='bx bxs-home'></i>
@@ -39,7 +39,7 @@
                     <i class='bx bx-user-pin'></i>
                     <i class='bx bxs-user-pin'></i>
                   </div>
-                  <span class="link hide">Student Profiles</span>
+                  <span class="link hide">User Profiles</span>
                 </a>
               </li>
               <li class="tooltip-element" data-tooltip="2">
@@ -49,6 +49,15 @@
                     <i class='bx bxs-message-square-detail'></i>
                   </div>
                   <span class="link hide">Student Documents</span>
+                </a>
+              </li>
+              <li class="tooltip-element" data-tooltip="3">
+                <a href="{% url 'announcements' %}" data-active="3">
+                  <div class="icon">
+                    <i class='bx bx-megaphone'></i>
+                    <i class='bx bxs-megaphone'></i>
+                  </div>
+                  <span class="link hide">Announcements</span>
                 </a>
               </li>
             </ul>

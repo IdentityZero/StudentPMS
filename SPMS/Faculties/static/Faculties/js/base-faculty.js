@@ -31,7 +31,12 @@ function updateSideBar() {
         sidebar_links[2].classList.add('active-link');
         var linkAnchor = sidebar_links[2].getElementsByTagName('a')[0];
         linkAnchor.classList.add('active')
-    }else {
+    } else if (currentUrl.includes("announcements")){
+        sidebar_links[3].classList.add('active-link');
+        var linkAnchor = sidebar_links[3].getElementsByTagName('a')[0];
+        linkAnchor.classList.add('active')
+    } 
+    else {
         sidebar_links[0].classList.add('active-link');
         var linkAnchor = sidebar_links[0].getElementsByTagName('a')[0];
         linkAnchor.classList.add('active')

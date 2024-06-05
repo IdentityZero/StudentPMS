@@ -81,7 +81,6 @@ document.getElementById("addNewTypeForm").addEventListener('submit', async funct
             alert("Cannot process your request!")
         }
     } catch (error) {
-        console.log("Error", error)
         alert("There was a problem processing this request! Try again later.")
     }
 
@@ -92,7 +91,6 @@ document.getElementById("addNewTypeForm").addEventListener('submit', async funct
 document.getElementById("doc-edit-form").addEventListener('submit', async function(e) {
     e.preventDefault()
 
-    console.log("Hello")
 
     const type = document.getElementById("doc-edit-type").value
     const comment = document.getElementById("doc-edit-comment").value
@@ -114,7 +112,7 @@ document.getElementById("doc-edit-form").addEventListener('submit', async functi
 
     try {
         const responseData = await postData1(url, formData);
-        console.log(responseData)
+        
         if (responseData.success = "OK") {
             alert("Document updated");
             updateDocumentRow(id, responseData.updated)
@@ -145,7 +143,7 @@ function documentTableRowTemplate(rawData) {
 
         rows += `
             <tr>
-                <td id="doc-description-${id}">${name}</td>
+                <td id="doc-name-${id}">${name}</td>
                 <td id="doc-type-${id}" data-value="${data.SD_doc_type.id}">${type}</td>
                 <td>${file_url ? `<a id="doc-file-${id}" href="${file_url}" target="_blank">${file_url.substring(7)}</a>` : 'None'}</td>
                 <td id="doc-description-${id}">${description}</td>
@@ -174,16 +172,68 @@ function documentSelectorBtn() {
             editDocument(id)
         })
     })
+
+    const delBtns = document.querySelectorAll("a[name='doc-del-btn']")
+
+    delBtns.forEach(btn => {
+        var id = btn.id.split("-")[3]
+        console.log(btn)
+        btn.addEventListener('click', function() {
+            updateDelButton(id)
+        })
+    })
+
+
 }
+
+
+function updateDelButton(id) {
+    document.getElementById("documentDelBtn").setAttribute('data-value', id)
+}
+
+
+
+
+
+
+async function deleteDocument(btn){
+    const id = btn.getAttribute('data-value')
+    const modal = document.getElementById("doc-del-formModal")
+    const modalCls = modal.querySelector(".btn-close");
+
+    const url = "http://localhost:8000/students/documents/delete/"
+
+    const data = { doc: id };
+
+    try {
+        const responseData = await postData(url, data);
+        
+        if (responseData.success = "OK") {
+            alert("Document Deleted");
+            document.getElementById("filter-button").click()
+            modalCls.click()
+        } else {
+            alert("Cannot process your request!")
+        }
+    } catch (error) {
+        alert("There was a problem processing this request! Try again later.")
+    }
+
+}
+
+
+
+
+
+
+
 
 function editDocument(id) {
     // Get all values
     const type = document.getElementById(`doc-type-${id}`).getAttribute('data-value');
     const comment = document.getElementById(`doc-comment-${id}`).textContent
     const file = document.getElementById(`doc-file-${id}`).getAttribute("href");
-    console.log(document.getElementById("edit-doc-clear").checked)
     document.getElementById("edit-doc-clear").checked = false
-    console.log(document.getElementById("edit-doc-clear").checked)
 
     // Set the values to the form
     const idContainer = document.getElementById("doc-edit-id")

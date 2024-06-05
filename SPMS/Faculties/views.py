@@ -5,8 +5,10 @@ from django.contrib import messages
 from django.db import IntegrityError
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+from django.db.models import Q
 
 from datetime import date, timedelta
 import json
@@ -14,9 +16,12 @@ import json
 from .models import FacultyProfile
 
 from Users.models import UsersProfile
+from Users.forms import UserRegistrationForm
 from Students.models import StudentProfile,StudentDocuments,StudentFamilyRecords,StudentEducationalBackground,DocumentTypes
 from Students.serializers import StudentDocumentsSerializer,DocumentTypesSerializer
-from University.models import Admissions,CurriculumCourses, StudentGrades,Courses
+from University.models import Admissions,CurriculumCourses, StudentGrades,Courses, Departments, Degrees, Curriculums,Announcements
+from University.serializers import DepartmentsSerializer,DepartmentsRelatedSerializer
+from University.forms import AnnouncementsForm
 
 # Create your views here.
 @login_required
@@ -25,13 +30,15 @@ def home(request):
     profile = UsersProfile.objects.get(user=user)
     try:
         faculty_profile = FacultyProfile.objects.get(profile=profile)
+        return redirect('faculty-student-profiles')
     except FacultyProfile.DoesNotExist:
         messages.info(request, 'Cannot access this platform.')
         logout(request)
         return redirect('login')
     return render(request, 'Faculties/home.html')
 
-
+#region Topic: Student Profiles
+# ***************************************** STUDENT PROFILES **************************************
 @login_required
 def student_profiles(request):
     context = {}
@@ -44,117 +51,38 @@ def student_profiles(request):
 
     context['students'] = students
 
+    if request.method == "POST":
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+
+            # Get user instance
+            user_name = request.POST.get('username') 
+            user = User.objects.get(username=user_name)
+
+            # Create a profile for the user
+            profile = UsersProfile.objects.create(user=user)
+            profile.save()
+
+            # Create Student profile or Faculty Profile
+            role = request.POST.get('roles')
+            if role == "Faculty":
+                # Create Faculty Profile
+                faculty_profile = FacultyProfile.objects.create(profile=profile)
+                faculty_profile.save()
+            else:
+                # Create Student Profile
+                student_profile = StudentProfile.objects.create(profile=profile)
+                student_profile.save()
+                curriculum = Curriculums.objects.first()
+                Admissions.objects.create(SP=student_profile, curriculum=curriculum)
+            
+            return redirect(reverse('faculty-student-profiles'))
+
+    context['form'] = UserRegistrationForm()
     return render(request, 'Faculties/student-profiles.html', context)
 
-
-@login_required
-def student_documents(request):
-    context = {}
-
-    documents = StudentDocuments.objects.all()
-    document_types = DocumentTypes.objects.all()
-
-    context['documents'] = documents
-    context['document_types'] = document_types
-
-    return render(request, 'Faculties/student-documents.html', context)
-
-
-def retrieveStudentDocuments(request):
-    res = {}
-
-    documents = StudentDocuments.objects.all()
-
-    if 'username' in request.GET:
-        username = request.GET['username']
-        students = StudentProfile.objects.filter(profile__user__username__icontains=username)
-        documents = documents.filter(SP__in=students)
-        
-    if 'type' in request.GET:
-        type = request.GET['type']
-        doc_type = DocumentTypes.objects.get(pk=type)
-        documents = documents.filter(SD_doc_type=doc_type)
-    
-    if 'ext' in request.GET:
-        ext = f".{request.GET['ext']}"
-        documents = documents.filter(SD_document__endswith=ext)
-
-    if 'date' in request.GET:
-        date = int(request.GET['date'])
-        date_filter = (timezone.now() - timedelta(days=date)).date()
-        documents = documents.filter(SD_date_uploaded__date=date_filter)
-
-
-    serializer = StudentDocumentsSerializer(documents, many=True)
-    return JsonResponse(serializer.data, safe=False)
-
-
-@csrf_exempt
-def updateDocument(request):
-    res = {}
-
-    data = request.POST
-    file = request.FILES
-
-    id = int(data['id'])
-    type = int(data['type'])
-    comment = data['comment']
-    clear = data['clear']
-
-    # Get Document instance
-    document = StudentDocuments.objects.get(pk=id)
-    document_type = DocumentTypes.objects.get(pk=type)
-
-    document.SD_doc_type = document_type
-    document.SD_comment = comment
-
-    if clear == "true":
-        document.SD_document.delete()
-        document.SD_document = None
-    
-    if file:
-        document.SD_document = file['file']
-
-    document.save()
-    serializer = StudentDocumentsSerializer(document)
-
-    res['message'] = "OK"
-    res['updated'] = serializer.data
-    return JsonResponse(res, status=200)
-    
-
-
-
-
-
-
-
-@csrf_exempt
-def addNewDocumentType(request):
-    res = {}
-
-    data = request.body
-    data = json.loads(data)
-
-    # unpack data
-    type = data['type']
-    description = data['description']
-
-    try:
-        DocumentTypes.objects.create(document_type=type, description=description)
-        res['success'] = ["OK"]
-    except IntegrityError:
-
-        res['error'] = "Document Type Already exists!"
-    
-    type= DocumentTypes.objects.all()
-
-    serializer = DocumentTypesSerializer(type, many=True)
-    res['updated'] = serializer.data 
-
-    return JsonResponse(res, status=200)
-
-
+# GET student profiles
 def retrieveStudentProfile(request):
     id = int(request.GET['id'])
 
@@ -179,7 +107,7 @@ def retrieveStudentProfile(request):
 
     return JsonResponse(data, status=200)
 
-
+# UPDATE Student Personal Information
 @csrf_exempt
 def updateStudentPersonalInformation(request):
     if request.method == "GET":
@@ -240,7 +168,7 @@ def updateStudentPersonalInformation(request):
 
     return JsonResponse(res, status=200)
 
-
+# GET Student Family Records
 def retrieveStudentFamilyRecords(request):
     res ={}
 
@@ -266,7 +194,7 @@ def retrieveStudentFamilyRecords(request):
     res['results'] = fam_records_arr
     return JsonResponse(res, status=200)
 
-
+# ADD Student Family Records
 @csrf_exempt
 def addStudentFamilyRecords(request):
     res = {}
@@ -301,6 +229,7 @@ def addStudentFamilyRecords(request):
     res['success'] = "OK"
     return JsonResponse(res, status=200)
 
+# UPDATE Student Family Records
 @csrf_exempt
 def updateStudentFamilyRecords(request):
     # this end point will receive
@@ -334,7 +263,7 @@ def updateStudentFamilyRecords(request):
     res['success'] = "OK"
     return JsonResponse(res, status=200)
 
-
+# DELETE Student Family Records
 @csrf_exempt
 def deleteStudentFamilyRecords(request):
     # This endpoint will receive an id of the family record
@@ -350,7 +279,7 @@ def deleteStudentFamilyRecords(request):
     res['success'] = "OK"
     return JsonResponse(res, status=200)
 
-
+# GET Student Grades
 def retrieveStudentGrades(request):
     id = int(request.GET['id'])
 
@@ -407,7 +336,7 @@ def retrieveStudentGrades(request):
 
     return JsonResponse(res, status=200)
 
-
+# ADD OR EDIT Student Grades
 @csrf_exempt
 def addEditStudentGrades(request):
     # this endpoit needs
@@ -455,7 +384,7 @@ def addEditStudentGrades(request):
 
     return JsonResponse(res,status=200)
 
-
+# GET Student Education Background
 def retrieveStudentEducationBG(request):
     res = {}
     id = int(request.GET['id'])
@@ -481,6 +410,7 @@ def retrieveStudentEducationBG(request):
 
     return JsonResponse(res, status=200)
 
+# ADD Student Eduation Background
 @csrf_exempt
 def addStudentEducationBG(request):
     res = {}
@@ -512,6 +442,7 @@ def addStudentEducationBG(request):
     res['success'] = "OK"
     return JsonResponse(res, status=200)
 
+# UPDATE Student Education Background
 @csrf_exempt
 def updateStudentEducationBG(request):
     # This endpoint will accept
@@ -541,7 +472,7 @@ def updateStudentEducationBG(request):
     res['success'] = "OK"
     return JsonResponse(res, status=200)
 
-
+# DELETE Student Ecuation Background
 @csrf_exempt
 def deleteStudentEducationBG(request):
     res = {}
@@ -555,4 +486,230 @@ def deleteStudentEducationBG(request):
 
     res['success'] = "OK"
     return JsonResponse(res, status=200)
+
+#endregion
+
+
+
+#region Topic: Student Documents
+# ***************************************** STUDENT DOCUMENTS **************************************
+@login_required
+def student_documents(request):
+    context = {}
+
+    documents = StudentDocuments.objects.all()
+    document_types = DocumentTypes.objects.all()
+
+    context['documents'] = documents
+    context['document_types'] = document_types
+
+    return render(request, 'Faculties/student-documents.html', context)
+
+
+def retrieveStudentDocuments(request):
+    res = {}
+
+    documents = StudentDocuments.objects.all()
+
+    if 'username' in request.GET:
+        username = request.GET['username']
+        # students = StudentProfile.objects.filter(profile__user__username__icontains=username)
+        students = StudentProfile.objects.filter(
+            Q(profile__user__first_name__icontains=username) |
+            Q(profile__user__last_name__icontains=username) |
+            Q(profile__user__username__icontains=username)
+        )
+        print(students)
+        documents = documents.filter(SP__in=students)
+    
+    if 'type' in request.GET:
+        type = request.GET['type']
+        doc_type = DocumentTypes.objects.get(pk=type)
+        documents = documents.filter(SD_doc_type=doc_type)
+    
+    if 'ext' in request.GET:
+        ext = f".{request.GET['ext']}"
+        documents = documents.filter(SD_document__endswith=ext)
+
+    if 'date' in request.GET:
+        date = int(request.GET['date'])
+        date_filter = (timezone.now() - timedelta(days=date)).date()
+        documents = documents.filter(SD_date_uploaded__date=date_filter)
+
+
+    serializer = StudentDocumentsSerializer(documents, many=True)
+    return JsonResponse(serializer.data, safe=False)
+
+
+@csrf_exempt
+def updateDocument(request):
+    res = {}
+
+    data = request.POST
+    file = request.FILES
+
+    id = int(data['id'])
+    type = int(data['type'])
+    comment = data['comment']
+    clear = data['clear']
+
+    # Get Document instance
+    document = StudentDocuments.objects.get(pk=id)
+    document_type = DocumentTypes.objects.get(pk=type)
+
+    document.SD_doc_type = document_type
+    document.SD_comment = comment
+
+    if clear == "true":
+        document.SD_document.delete()
+        document.SD_document = None
+    
+    if file:
+        document.SD_document = file['file']
+
+    document.save()
+    serializer = StudentDocumentsSerializer(document)
+
+    res['message'] = "OK"
+    res['updated'] = serializer.data
+    return JsonResponse(res, status=200)
+    
+
+@csrf_exempt
+def addNewDocumentType(request):
+    res = {}
+
+    data = request.body
+    data = json.loads(data)
+
+    # unpack data
+    type = data['type']
+    description = data['description']
+
+    try:
+        DocumentTypes.objects.create(document_type=type, description=description)
+        res['success'] = ["OK"]
+    except IntegrityError:
+
+        res['error'] = "Document Type Already exists!"
+    
+    type= DocumentTypes.objects.all()
+
+    serializer = DocumentTypesSerializer(type, many=True)
+    res['updated'] = serializer.data 
+
+    return JsonResponse(res, status=200)
+
+#endregion
+
+
+
+#region Topic: Announcements
+# ***************************************** Announcements **************************************
+@login_required
+def announcements(request):
+    context = {}
+
+    announcements = Announcements.objects.all().order_by('-id')
+    context['announcements'] = announcements
+
+    if request.method == "POST":
+        form = AnnouncementsForm(request.POST)
+
+        if form.is_valid():
+            user = request.user
+            profile = UsersProfile.objects.get(user=user)
+            faculty_profile = FacultyProfile.objects.get(profile=profile)
+            announcement = form.save(commit=False)
+            announcement.author = faculty_profile
+            announcement.is_active = True
+            announcement.save()
+
+    else:
+        form = AnnouncementsForm()
+    
+    context['form'] = form
+
+    return render(request, 'Faculties/announcements.html', context)
+
+@csrf_exempt
+def editAnnouncements(request):
+    res = {}
+
+
+    data = json.loads(request.body)
+    id = data['id']
+    title = data['title']
+    content = data['content']
+    active = data['active']
+    active = True if active == "yes" else False
+
+    announcement = Announcements.objects.get(pk=id)
+    announcement.title = title
+    announcement.content = content
+    announcement.is_active = active
+    announcement.save()
+
+
+    res['success'] = "OK"
+    return JsonResponse(res, status=200)
+
+#endregion
+
+
+
+#region Topic: Departments
+# ***************************************** Departments **************************************
+@login_required
+def departments(request):
+    context = {}
+
+    departments = Departments.objects.all()
+    context['departments'] = departments
+
+    return render(request, 'Faculties/departments.html', context)
+
+
+def retrieveDepartmentDetails(request):
+    res = {}
+
+    id = int(request.GET['id'])
+
+    department = Departments.objects.get(pk=id)
+    serializer = DepartmentsRelatedSerializer(instance=department)
+
+    res['result'] = serializer.data
+    return JsonResponse(res, status=200)
+
+
+@csrf_exempt
+def addDepartment(request):
+    res = {}
+
+    data = request.body
+    data = json.loads(data)
+    print(data)
+
+    # unpack data
+    department_name = data['department_name']
+
+    try:
+        Departments.objects.create(department_name=department_name)
+    except IntegrityError:
+
+        res['error'] = "Department Already exists!"
+        return JsonResponse(res,status=200)
+    
+    departments = Departments.objects.all()
+    serializer = DepartmentsSerializer(departments, many=True)
+    res['success'] = ["OK"]
+    res['updated'] = serializer.data
+    return JsonResponse(res,status=200)
+
+#endregion
+
+
+
+
+
 

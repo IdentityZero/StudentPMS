@@ -22,7 +22,14 @@ from .views import (home,
                     
                     retrieveStudentDocuments,
                     addNewDocumentType,
-                    updateDocument)
+                    updateDocument,
+                    
+                    departments,
+                    addDepartment,
+                    retrieveDepartmentDetails,
+                    
+                    announcements,
+                    editAnnouncements)
 
 urlpatterns = [
     path("", home, name='faculty-home'),
@@ -43,4 +50,13 @@ urlpatterns = [
     path("student_profiles/education/add/", addStudentEducationBG),
     path("student_profiles/education/update/", updateStudentEducationBG),
     path("student_profiles/education/delete/", deleteStudentEducationBG),
+
+
+    path("departments/", departments, name="departments"),
+    path("departments/add/", addDepartment),
+    path("departments/detail/", retrieveDepartmentDetails),
+
+
+    path("announcements/", announcements, name="announcements"),
+    path("announcements/update/", editAnnouncements),
 ]

@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from Students.models import StudentProfile
 from Faculties.models import FacultyProfile
 
+from University.models import Admissions, Curriculums
 
 from .forms import UserRegistrationForm
 from .models import UsersProfile
@@ -51,7 +52,10 @@ def register(request):
                 student_profile = StudentProfile.objects.create(profile=profile)
                 student_profile.save()
 
-            return redirect('login')
+                # Save admission
+                curriculum = Curriculums.objects.first()
+                Admissions.objects.create(SP=student_profile, curriculum=curriculum)
+
         else:
             print(form.errors)
 
